@@ -1,4 +1,4 @@
-FROM node:20
+FROM node:20-alpine
 
 WORKDIR /app
 
@@ -8,6 +8,8 @@ RUN npm install
 
 COPY . .
 
-EXPOSE 5000
+EXPOSE 3000
+
+ENV NEXT_TELEMETRY_DISABLED=1
 
 CMD ["npm", "run", "dev"]

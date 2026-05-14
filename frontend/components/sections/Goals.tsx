@@ -6,6 +6,7 @@ import { Tabs } from "@/components/ui/Tabs";
 export function Goals() {
   const [goals, setGoals]     = useState<Goal[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError]     = useState<string>("");
   const [activeTab, setActiveTab] = useState("Active Goals");
   const [showModal, setShowModal] = useState(false);
   const [newGoal, setNewGoal] = useState({
@@ -21,10 +22,13 @@ export function Goals() {
   useEffect(() => {
     const fetchGoals = async () => {
       try {
+        setError("");
         const data = await goalsApi.getAll();
         setGoals(data);
       } catch (err: any) {
-        console.error(err.message);
+        const errorMsg = err.message || "Failed to fetch goals";
+        console.error("Goals fetch error:", errorMsg);
+        setError(errorMsg);
       } finally {
         setLoading(false);
       }

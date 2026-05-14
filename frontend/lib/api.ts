@@ -1,32 +1,51 @@
+// Import canonical types from the single source of truth
+import type { Task, Goal, Habit, User } from "@/types";
+
+// Re-export so existing `import { Task } from "@/lib/api"` imports keep working
+export type { Task, Goal, Habit, User };
+
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 const getToken = () => localStorage.getItem("token");
 
 // ── Generic fetch wrapper ──────────────────────────────
 const request = async <T>(path: string, options?: RequestInit): Promise<T> => {
-  const res = await fetch(`${BASE_URL}${path}`, {
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...(getToken() ? { Authorization: `Bearer ${getToken()}` } : {}),
-    },
-  });
+  try {
+    const res = await fetch(`${BASE_URL}${path}`, {
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...(getToken() ? { Authorization: `Bearer ${getToken()}` } : {}),
+      },
+    });
 
-  if (res.status === 401) {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    window.location.href = "/login";
-    throw new Error("Unauthorized");
+    if (res.status === 401) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.location.href = "/login";
+      throw new Error("Unauthorized - please log in again");
+    }
+
+    if (res.status === 204) return null as T;
+
+    if (!res.ok) {
+      let errorMsg = `HTTP ${res.status}`;
+      try {
+        const error = await res.json();
+        errorMsg = error.message || errorMsg;
+      } catch {
+        // Response body might not be JSON
+      }
+      throw new Error(errorMsg);
+    }
+
+    return res.json();
+  } catch (err: any) {
+    // Network or parse errors
+    const message = err.message || "Network error - backend may be unavailable";
+    console.error(`API Error [${path}]:`, message);
+    throw new Error(message);
   }
-
-  if (res.status === 204) return null as T;  // DELETE ไม่มี body
-
-  if (!res.ok) {
-    const error = await res.json();
-    throw new Error(error.message || "เกิดข้อผิดพลาด");
-  }
-
-  return res.json();
 };
 
 // ── Tasks ──────────────────────────────────────────────
@@ -77,67 +96,3 @@ export const habitsApi = {
 export const authApi = {
   me: () => request<User>("/api/auth/me"),
 };
-
-// ── Types (inline เพื่อให้ใช้ได้ทันที) ────────────────
-export interface Task {
-  _id: string;
-  title: string;
-  description?: string;
-  status: "todo" | "in_progress" | "done" | "cancelled";
-  priority: "low" | "medium" | "high" | "urgent";
-  tags: string[];
-  goalId?: string;
-  dueDate?: string;
-  completedAt?: string;
-  createdAt: string;
-}
-
-export interface Milestone {
-  _id: string;
-  title: string;
-  completed: boolean;
-  completedAt?: string;
-  dueDate?: string;
-}
-
-export interface Goal {
-  _id: string;
-  title: string;
-  description?: string;
-  category: "learning" | "health" | "career" | "finance" | "relationship" | "other";
-  status: "active" | "completed" | "paused" | "cancelled";
-  priority: "low" | "medium" | "high";
-  targetDate: string;
-  progress: number;
-  milestones: Milestone[];
-  whyImportant?: string;
-  createdAt: string;
-}
-
-export interface HabitLog {
-  date: string;
-  completed: boolean;
-  count: number;
-  note?: string;
-}
-
-export interface Habit {
-  _id: string;
-  title: string;
-  icon?: string;
-  color?: string;
-  frequency: "daily" | "weekly" | "custom";
-  targetCount: number;
-  streak: number;
-  longestStreak: number;
-  logs: HabitLog[];
-  isActive: boolean;
-  createdAt: string;
-}
-
-export interface User {
-  id: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-}
