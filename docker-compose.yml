@@ -5,7 +5,11 @@ services:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
-
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   backend:
     build: ./backend
     ports:
@@ -16,8 +20,8 @@ services:
       - JWT_SECRET=yPvkJczjzZkP5owDIuuPrX8Wg0vbEGXGeI9TivZnBsm
       - NODE_ENV=development
     depends_on:
-      - mongodb
-
+      mongodb:
+        condition: service_healthy
   frontend:
     build: ./frontend
     ports:
