@@ -21,7 +21,7 @@ const WEEKLY_STATS = [
   ["Longest focus block", "3h 20m"],
 ];
 
-export function Reports() {
+export function Journal() {
   const [activeTab, setActiveTab] = useState("Weekly Summary");
   const tabs = ["Weekly Summary", "Monthly Overview", "Progress Charts"];
 

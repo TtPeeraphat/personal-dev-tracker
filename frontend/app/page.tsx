@@ -14,7 +14,7 @@ import { Settings }  from "@/components/sections/Settings";
 import { useTasks }  from "@/hooks/useTasks";
 import { useHabits } from "@/hooks/useHabits";
 import { useGoals } from "@/hooks/useGoals";
-import { Reports as Journal } from "@/components/sections/Journal";
+import { Journal } from "@/components/sections/Journal";
 
 function PersonalDevTracker() {
   const [activeSection, setActiveSection] = useState("dashboard");
