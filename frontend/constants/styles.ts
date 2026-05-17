@@ -43,9 +43,9 @@ export const WEEK_GRID_DATA: Record<string, boolean[]> = {
 
 export const NAV: NavItem[] = [
   { id: "dashboard", label: "Dashboard", icon: "⊞", badge: null },
-  { id: "tasks",     label: "Tasks",     icon: "✓", badge: "12" },
-  { id: "goals",     label: "Goals",     icon: "◎", badge: "4" },
-  { id: "habits",    label: "Habits",    icon: "⚡", badge: "3", badgeRed: true },
+  { id: "tasks",     label: "Tasks",     icon: "✓", badge: null },
+  { id: "goals",     label: "Goals",     icon: "◎", badge: null },
+  { id: "habits",    label: "Habits",    icon: "⚡", badge: null, badgeRed: true },
   { id: "reports",   label: "Reports",   icon: "▦", badge: null },
   { id: "journal",   label: "Journal",   icon: "📓", badge: null },
   { id: "settings",  label: "Settings",  icon: "⚙", badge: null },

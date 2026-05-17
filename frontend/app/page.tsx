@@ -47,7 +47,7 @@ function PersonalDevTracker() {
     <div style={S.app}>
       <Sidebar section={activeSection} setSection={setActiveSection} />
       <div style={S.main}>
-        <Topbar section={activeSection} />
+        <Topbar section={activeSection} setSection={setActiveSection} />
         <div style={S.content}>
           {renderSection()}
         </div>

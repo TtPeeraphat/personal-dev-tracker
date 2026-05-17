@@ -21,6 +21,18 @@ export function Tasks() {
     tags:     [] as string[],
   });
 
+  // Listen for Topbar "New Task" trigger
+  useEffect(() => {
+    const handleTrigger = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      if (customEvent.detail?.section === "tasks" || customEvent.detail?.section === "dashboard") {
+        setShowModal(true);
+      }
+    };
+    window.addEventListener("trigger-create", handleTrigger);
+    return () => window.removeEventListener("trigger-create", handleTrigger);
+  }, []);
+
   const tabs    = ["All Tasks", "Today", "Upcoming", "Completed"];
   const filters = ["All", "Work", "Health", "Study"];
 

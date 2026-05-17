@@ -16,6 +16,18 @@ export function Goals() {
     targetDate: "",
   });
 
+  // Listen for Topbar "New Goal" trigger
+  useEffect(() => {
+    const handleTrigger = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      if (customEvent.detail?.section === "goals") {
+        setShowModal(true);
+      }
+    };
+    window.addEventListener("trigger-create", handleTrigger);
+    return () => window.removeEventListener("trigger-create", handleTrigger);
+  }, []);
+
   const tabs = ["Active Goals", "Milestones", "Completed"];
 
   // ── ดึงข้อมูล ─────────────────────────────────────

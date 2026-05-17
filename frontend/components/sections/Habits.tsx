@@ -12,6 +12,18 @@ export function Habits() {
     title: "", icon: "⚡", color: "#1D9E75", frequency: "daily" as Habit["frequency"],
   });
 
+  // Listen for Topbar "New Habit" trigger
+  useEffect(() => {
+    const handleTrigger = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      if (customEvent.detail?.section === "habits") {
+        setShowModal(true);
+      }
+    };
+    window.addEventListener("trigger-create", handleTrigger);
+    return () => window.removeEventListener("trigger-create", handleTrigger);
+  }, []);
+
   const tabs = ["Today's Habits", "Habit History"];
 
   // ── ดึงข้อมูล ─────────────────────────────────────
