@@ -4,15 +4,20 @@ import { useState, useEffect, useCallback } from 'react'
 import { habitsApi } from '@/lib/api'
 import { Habit } from '@/types'
 
-export function useHabits() {
-  const [habits, setHabits]   = useState<Habit[]>([])
-  const [loading, setLoading] = useState(true)
+interface UseHabitsOptions {
+  initialData?: Habit[]
+}
+
+export function useHabits(options: UseHabitsOptions = {}) {
+  const [habits, setHabits]   = useState<Habit[]>(options.initialData ?? [])
+  const [loading, setLoading] = useState(!options.initialData)
   const [error, setError]     = useState<string | null>(null)
 
   const fetchHabits = useCallback(async () => {
     try {
       setLoading(true)
-      const data = await habitsApi.getAll() as Habit[]
+      setError(null)
+      const data = await habitsApi.getAll()
       setHabits(data)
     } catch (err: any) {
       setError(err.message)
@@ -21,16 +26,18 @@ export function useHabits() {
     }
   }, [])
 
-  useEffect(() => { fetchHabits() }, [fetchHabits])
+  useEffect(() => {
+    if (!options.initialData) fetchHabits()
+  }, [fetchHabits, options.initialData])
 
   const createHabit = async (data: Partial<Habit>) => {
-    const newHabit = await habitsApi.create(data) as Habit
+    const newHabit = await habitsApi.create(data)
     setHabits(prev => [newHabit, ...prev])
     return newHabit
   }
 
   const updateHabit = async (id: string, data: Partial<Habit>) => {
-    const updated = await habitsApi.update(id, data) as Habit
+    const updated = await habitsApi.update(id, data)
     setHabits(prev => prev.map(h => h._id === id ? updated : h))
     return updated
   }
@@ -41,7 +48,7 @@ export function useHabits() {
   }
 
   const logToday = async (id: string, data: { completed: boolean; note?: string }) => {
-    const updated = await habitsApi.logToday(id, data) as Habit
+    const updated = await habitsApi.logToday(id, data)
     setHabits(prev => prev.map(h => h._id === id ? updated : h))
     return updated
   }

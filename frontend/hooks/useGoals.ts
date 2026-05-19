@@ -4,15 +4,20 @@ import { useState, useEffect, useCallback } from 'react'
 import { goalsApi } from '@/lib/api'
 import { Goal } from '@/types'
 
-export function useGoals() {
-  const [goals, setGoals]     = useState<Goal[]>([])
-  const [loading, setLoading] = useState(true)
+interface UseGoalsOptions {
+  initialData?: Goal[]
+}
+
+export function useGoals(options: UseGoalsOptions = {}) {
+  const [goals, setGoals]     = useState<Goal[]>(options.initialData ?? [])
+  const [loading, setLoading] = useState(!options.initialData)
   const [error, setError]     = useState<string | null>(null)
 
   const fetchGoals = useCallback(async () => {
     try {
       setLoading(true)
-      const data = await goalsApi.getAll() as Goal[]
+      setError(null)
+      const data = await goalsApi.getAll()
       setGoals(data)
     } catch (err: any) {
       setError(err.message)
@@ -21,16 +26,18 @@ export function useGoals() {
     }
   }, [])
 
-  useEffect(() => { fetchGoals() }, [fetchGoals])
+  useEffect(() => {
+    if (!options.initialData) fetchGoals()
+  }, [fetchGoals, options.initialData])
 
   const createGoal = async (data: Partial<Goal>) => {
-    const newGoal = await goalsApi.create(data) as Goal
+    const newGoal = await goalsApi.create(data)
     setGoals(prev => [newGoal, ...prev])
     return newGoal
   }
 
   const updateGoal = async (id: string, data: Partial<Goal>) => {
-    const updated = await goalsApi.update(id, data) as Goal
+    const updated = await goalsApi.update(id, data)
     setGoals(prev => prev.map(g => g._id === id ? updated : g))
     return updated
   }

@@ -1,11 +1,15 @@
 "use client";
 
 import { useState } from "react";
+// ใช้ request helper จาก lib/api แทน BASE_URL ที่ประกาศซ้ำ
+import { loginApi } from "@/lib/api";
 
 export default function LoginPage() {
   const [isRegister, setIsRegister] = useState(false);
   const [loading, setLoading]       = useState(false);
   const [error, setError]           = useState("");
+  // รองรับ field-level errors จาก zod validation ของ backend
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const [form, setForm] = useState({
     email:     "",
@@ -14,14 +18,15 @@ export default function LoginPage() {
     lastName:  "",
   });
 
-  const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    // ล้าง field error เมื่อผู้ใช้แก้ไข
+    if (fieldErrors[e.target.name]) {
+      setFieldErrors(prev => ({ ...prev, [e.target.name]: "" }));
+    }
   };
 
   const handleSubmit = async () => {
-    // ── Validate ──────────────────────────────────────
     if (!form.email || !form.password) {
       setError("กรุณากรอกอีเมลและรหัสผ่าน");
       return;
@@ -33,254 +38,212 @@ export default function LoginPage() {
 
     setLoading(true);
     setError("");
+    setFieldErrors({});
 
     try {
-      const endpoint = isRegister ? "/api/auth/register" : "/api/auth/login";
-      const body     = isRegister ? form : { email: form.email, password: form.password };
+      const body = isRegister
+        ? form
+        : { email: form.email, password: form.password };
 
-      const res = await fetch(`${BASE_URL}${endpoint}`, {
-        method:  "POST",
-        headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify(body),
-      });
+      const data = await (isRegister
+        ? loginApi.register(body)
+        : loginApi.login(body));
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.message || "เกิดข้อผิดพลาด");
-        return;
-      }
-
-      // ── เก็บ token และข้อมูล user ──────────────────
-      localStorage.setItem("token",     data.token);
-      localStorage.setItem("user",      JSON.stringify(data.user));
-
-      // ── redirect ไปหน้าหลัก ────────────────────────
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user",  JSON.stringify(data.user));
       window.location.href = "/";
 
-    } catch {
-      setError("ไม่สามารถเชื่อมต่อ server ได้");
+    } catch (err: any) {
+      // backend ส่ง { message, errors: [{field, message}] } มาจาก zod middleware
+      if (err.fieldErrors) {
+        const map: Record<string, string> = {};
+        for (const e of err.fieldErrors) map[e.field] = e.message;
+        setFieldErrors(map);
+        setError("กรุณาตรวจสอบข้อมูลที่กรอก");
+      } else {
+        setError(err.message || "ไม่สามารถเชื่อมต่อ server ได้");
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  // กด Enter แล้ว submit ได้เลย
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") handleSubmit();
   };
 
+  const inputStyle = (field: string): React.CSSProperties => ({
+    ...styles.input,
+    borderColor: fieldErrors[field] ? "#A32D2D" : "rgba(0,0,0,0.12)",
+  });
+
   return (
     <div style={styles.page}>
       <div style={styles.card}>
-
-        {/* Logo */}
         <div style={styles.logo}>
           dev<span style={{ color: "#1D9E75" }}>·</span>track
         </div>
         <div style={styles.logoSub}>personal growth os</div>
 
-        {/* Toggle Login / Register */}
         <div style={styles.toggleRow}>
           <button
-            style={styles.toggleBtn(isRegister === false)}
-            onClick={() => { setIsRegister(false); setError(""); }}
+            style={styles.toggleBtn(!isRegister)}
+            onClick={() => { setIsRegister(false); setError(""); setFieldErrors({}); }}
+            suppressHydrationWarning
           >
             เข้าสู่ระบบ
           </button>
           <button
-            style={styles.toggleBtn(isRegister === true)}
-            onClick={() => { setIsRegister(true); setError(""); }}
+            style={styles.toggleBtn(isRegister)}
+            onClick={() => { setIsRegister(true); setError(""); setFieldErrors({}); }}
+            suppressHydrationWarning
           >
             สมัครสมาชิก
           </button>
         </div>
 
-        {/* Register เพิ่มชื่อ-นามสกุล */}
         {isRegister && (
           <div style={styles.row}>
             <div style={{ flex: 1 }}>
               <label style={styles.label}>ชื่อ</label>
               <input
-                style={styles.input}
+                style={inputStyle("firstName")}
                 name="firstName"
                 placeholder="สมชาย"
                 value={form.firstName}
                 onChange={handleChange}
                 onKeyDown={handleKeyDown}
+                suppressHydrationWarning
               />
+              {fieldErrors.firstName && <span style={styles.fieldError}>{fieldErrors.firstName}</span>}
             </div>
             <div style={{ flex: 1 }}>
               <label style={styles.label}>นามสกุล</label>
               <input
-                style={styles.input}
+                style={inputStyle("lastName")}
                 name="lastName"
                 placeholder="ใจดี"
                 value={form.lastName}
                 onChange={handleChange}
                 onKeyDown={handleKeyDown}
+                suppressHydrationWarning
               />
+              {fieldErrors.lastName && <span style={styles.fieldError}>{fieldErrors.lastName}</span>}
             </div>
           </div>
         )}
 
-        {/* Email */}
         <div style={{ marginBottom: 12 }}>
           <label style={styles.label}>อีเมล</label>
           <input
-            style={styles.input}
+            style={inputStyle("email")}
             name="email"
             type="email"
             placeholder="you@example.com"
             value={form.email}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
+            suppressHydrationWarning
           />
+          {fieldErrors.email && <span style={styles.fieldError}>{fieldErrors.email}</span>}
         </div>
 
-        {/* Password */}
         <div style={{ marginBottom: 16 }}>
           <label style={styles.label}>รหัสผ่าน</label>
           <input
-            style={styles.input}
+            style={inputStyle("password")}
             name="password"
             type="password"
             placeholder={isRegister ? "อย่างน้อย 6 ตัวอักษร" : "••••••••"}
             value={form.password}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
+            suppressHydrationWarning
           />
+          {fieldErrors.password && <span style={styles.fieldError}>{fieldErrors.password}</span>}
         </div>
 
-        {/* Error message */}
-        {error && (
-          <div style={styles.error}>{error}</div>
-        )}
+        {error && <div style={styles.error}>{error}</div>}
 
-        {/* Submit Button */}
         <button
-          style={styles.submitBtn}
+          style={{ ...styles.submitBtn, opacity: loading ? 0.7 : 1 }}
           onClick={handleSubmit}
           disabled={loading}
+          suppressHydrationWarning
         >
           {loading
             ? "กำลังดำเนินการ..."
             : isRegister ? "สมัครสมาชิก" : "เข้าสู่ระบบ"
           }
         </button>
-
       </div>
     </div>
   );
 }
 
-// ── Styles ────────────────────────────────────────────────────────────────────
-
 const styles = {
   page: {
-    minHeight:      "100vh",
-    display:        "flex",
-    alignItems:     "center",
-    justifyContent: "center",
-    background:     "#FAFAF8",
-    fontFamily:     "'DM Sans', system-ui, sans-serif",
+    minHeight: "100vh", display: "flex",
+    alignItems: "center", justifyContent: "center",
+    background: "#FAFAF8", fontFamily: "'DM Sans', system-ui, sans-serif",
   } as React.CSSProperties,
 
   card: {
-    background:   "#fff",
-    border:       "0.5px solid rgba(0,0,0,0.08)",
-    borderRadius: 16,
-    padding:      "36px 32px",
-    width:        "100%",
-    maxWidth:     400,
+    background: "#fff", border: "0.5px solid rgba(0,0,0,0.08)",
+    borderRadius: 16, padding: "36px 32px", width: "100%", maxWidth: 400,
   } as React.CSSProperties,
 
   logo: {
-    fontFamily:    "Georgia, serif",
-    fontSize:      24,
-    fontStyle:     "italic",
-    letterSpacing: "-0.02em",
-    marginBottom:  4,
-    textAlign:     "center",
+    fontFamily: "Georgia, serif", fontSize: 24, fontStyle: "italic",
+    letterSpacing: "-0.02em", marginBottom: 4, textAlign: "center",
   } as React.CSSProperties,
 
   logoSub: {
-    fontFamily:   "monospace",
-    fontSize:     11,
-    color:        "#888780",
-    textAlign:    "center",
-    marginBottom: 28,
+    fontFamily: "monospace", fontSize: 11, color: "#888780",
+    textAlign: "center", marginBottom: 28,
   } as React.CSSProperties,
 
   toggleRow: {
-    display:         "flex",
-    background:      "#F4F4F0",
-    borderRadius:    8,
-    padding:         3,
-    marginBottom:    24,
+    display: "flex", background: "#F4F4F0",
+    borderRadius: 8, padding: 3, marginBottom: 24,
   } as React.CSSProperties,
 
   toggleBtn: (active: boolean): React.CSSProperties => ({
-    flex:         1,
-    padding:      "7px 0",
-    borderRadius: 6,
-    border:       active ? "0.5px solid rgba(0,0,0,0.08)" : "none",
-    background:   active ? "#fff" : "transparent",
-    color:        active ? "#1a1a18" : "#888780",
-    fontSize:     13,
-    fontWeight:   active ? 500 : 400,
-    cursor:       "pointer",
-    fontFamily:   "inherit",
-    transition:   "all 0.15s",
+    flex: 1, padding: "7px 0", borderRadius: 6,
+    border: active ? "0.5px solid rgba(0,0,0,0.08)" : "none",
+    background: active ? "#fff" : "transparent",
+    color: active ? "#1a1a18" : "#888780",
+    fontSize: 13, fontWeight: active ? 500 : 400,
+    cursor: "pointer", fontFamily: "inherit", transition: "all 0.15s",
   }),
 
-  row: {
-    display:      "flex",
-    gap:          12,
-    marginBottom: 12,
-  } as React.CSSProperties,
+  row: { display: "flex", gap: 12, marginBottom: 12 } as React.CSSProperties,
 
   label: {
-    display:      "block",
-    fontSize:     11,
-    color:        "#888780",
-    marginBottom: 5,
-    fontWeight:   500,
+    display: "block", fontSize: 11, color: "#888780",
+    marginBottom: 5, fontWeight: 500,
   } as React.CSSProperties,
 
   input: {
-    width:        "100%",
-    padding:      "9px 12px",
-    borderRadius: 8,
-    border:       "0.5px solid rgba(0,0,0,0.12)",
-    background:   "#fff",
-    fontSize:     13,
-    color:        "#1a1a18",
-    outline:      "none",
-    fontFamily:   "inherit",
-    boxSizing:    "border-box",
+    width: "100%", padding: "9px 12px", borderRadius: 8,
+    border: "0.5px solid rgba(0,0,0,0.12)", background: "#fff",
+    fontSize: 13, color: "#1a1a18", outline: "none",
+    fontFamily: "inherit", boxSizing: "border-box" as const,
+  } as React.CSSProperties,
+
+  fieldError: {
+    display: "block", fontSize: 11, color: "#A32D2D", marginTop: 3,
   } as React.CSSProperties,
 
   error: {
-    background:   "#FCEBEB",
-    color:        "#A32D2D",
-    fontSize:     12,
-    padding:      "8px 12px",
-    borderRadius: 7,
-    marginBottom: 12,
+    background: "#FCEBEB", color: "#A32D2D", fontSize: 12,
+    padding: "8px 12px", borderRadius: 7, marginBottom: 12,
   } as React.CSSProperties,
 
   submitBtn: {
-    width:        "100%",
-    padding:      "10px 0",
-    borderRadius: 8,
-    border:       "none",
-    background:   "#1D9E75",
-    color:        "#fff",
-    fontSize:     14,
-    fontWeight:   500,
-    cursor:       "pointer",
-    fontFamily:   "inherit",
-    transition:   "opacity 0.15s",
+    width: "100%", padding: "10px 0", borderRadius: 8,
+    border: "none", background: "#1D9E75", color: "#fff",
+    fontSize: 14, fontWeight: 500, cursor: "pointer",
+    fontFamily: "inherit", transition: "opacity 0.15s",
   } as React.CSSProperties,
 };
