@@ -6,19 +6,27 @@ import cors from 'cors'
 import connectDB from './lib/db'
 import authRoutes  from './routes/auth'
 import taskRoutes  from './routes/tasks'
-import goalRoutes  from './routes/goals'    // เพิ่ม
-import habitRoutes from './routes/habits'   // เพิ่ม
+import goalRoutes  from './routes/goals'
+import habitRoutes from './routes/habits'
 
 const app = express()
-app.use(cors())
-app.use(express.json())
 
+// ✅ แก้ CORS ให้รับจาก Vercel domain จริง
+app.use(cors({
+  origin: [
+    'http://localhost:3000',
+    process.env.FRONTEND_URL || 'https://your-app.vercel.app'
+  ],
+  credentials: true,
+}))
+
+app.use(express.json())
 connectDB()
 
 app.use('/api/auth',   authRoutes)
 app.use('/api/tasks',  taskRoutes)
-app.use('/api/goals',  goalRoutes)    // เพิ่ม
-app.use('/api/habits', habitRoutes)   // เพิ่ม
+app.use('/api/goals',  goalRoutes)
+app.use('/api/habits', habitRoutes)
 
 app.get('/health', (_, res) => res.json({ status: 'ok' }))
 

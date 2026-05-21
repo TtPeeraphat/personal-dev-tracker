@@ -1,0 +1,20 @@
+# ข้ามไฟล์เฉพาะเจาะจง (เช่น ไฟล์เก็บความลับ Environment)
+.env
+.env.local
+
+# ข้ามทั้งโฟลเดอร์ (ใส่ / ไว้ด้านหลัง)
+node_modules/
+.venv/
+dist/
+build/
+
+# ข้ามไฟล์ตามนามสกุล (เช่น ไฟล์ Log ทั้งหมด)
+*.log
+
+# ข้ามไฟล์ที่สร้างโดย OS อัตโนมัติ
+.DS_Store
+Thumbs.db
+
+echo "node_modules/" >> .gitignore
+echo ".env" >> .gitignore
+echo ".next/" >> .gitignore

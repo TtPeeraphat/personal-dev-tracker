@@ -27,47 +27,46 @@ export default function LoginPage() {
   };
 
   const handleSubmit = async () => {
-    if (!form.email || !form.password) {
-      setError("กรุณากรอกอีเมลและรหัสผ่าน");
-      return;
+  if (!form.email || !form.password) {
+    setError("กรุณากรอกอีเมลและรหัสผ่าน");
+    return;
+  }
+  if (isRegister && (!form.firstName || !form.lastName)) {
+    setError("กรุณากรอกชื่อและนามสกุล");
+    return;
+  }
+
+  setLoading(true);
+  setError("");
+
+  try {
+    let data;
+
+
+    if (isRegister) {
+      data = await loginApi.register({
+        email:     form.email,
+        password:  form.password,
+        firstName: form.firstName,
+        lastName:  form.lastName,
+      });
+    } else {
+      data = await loginApi.login({
+        email:    form.email,
+        password: form.password,
+      });
     }
-    if (isRegister && (!form.firstName || !form.lastName)) {
-      setError("กรุณากรอกชื่อและนามสกุล");
-      return;
-    }
 
-    setLoading(true);
-    setError("");
-    setFieldErrors({});
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("user",  JSON.stringify(data.user));
+    window.location.href = "/";
 
-    try {
-      const body = isRegister
-        ? form
-        : { email: form.email, password: form.password };
-
-      const data = await (isRegister
-        ? loginApi.register(body)
-        : loginApi.login(body));
-
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user",  JSON.stringify(data.user));
-      window.location.href = "/";
-
-    } catch (err: any) {
-      // backend ส่ง { message, errors: [{field, message}] } มาจาก zod middleware
-      if (err.fieldErrors) {
-        const map: Record<string, string> = {};
-        for (const e of err.fieldErrors) map[e.field] = e.message;
-        setFieldErrors(map);
-        setError("กรุณาตรวจสอบข้อมูลที่กรอก");
-      } else {
-        setError(err.message || "ไม่สามารถเชื่อมต่อ server ได้");
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  } catch (err: any) {
+    setError(err.message || "เกิดข้อผิดพลาด");
+  } finally {
+    setLoading(false);
+  }
+};
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") handleSubmit();
   };
