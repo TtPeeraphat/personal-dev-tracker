@@ -3,10 +3,15 @@ import { goalsApi, Goal } from "@/lib/api";
 import { S, modalOverlay, modalBox, labelStyle } from "@/constants/styles";
 import { Tabs } from "@/components/ui/Tabs";
 
-export function Goals() {
-  const [goals, setGoals]     = useState<Goal[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError]     = useState<string>("");
+interface GoalsProps {
+  goals?: Goal[];
+  loading?: boolean;
+  error?: string | null;
+}
+
+export function Goals({ goals: initialGoals, loading: initialLoading, error: initialError }: GoalsProps = {}) {
+  const [goals, setGoals]     = useState<Goal[]>(initialGoals || []);
+  const [loading, setLoading] = useState(initialLoading ?? true);
   const [activeTab, setActiveTab] = useState("Active Goals");
   const [showModal, setShowModal] = useState(false);
   const [newGoal, setNewGoal] = useState({
@@ -32,21 +37,26 @@ export function Goals() {
 
   // ── ดึงข้อมูล ─────────────────────────────────────
   useEffect(() => {
+    // Skip refetch if data was passed via props
+    if (initialGoals && initialGoals.length > 0) {
+      setGoals(initialGoals);
+      setLoading(initialLoading ?? false);
+      return;
+    }
+
     const fetchGoals = async () => {
       try {
-        setError("");
         const data = await goalsApi.getAll();
         setGoals(data);
       } catch (err: any) {
         const errorMsg = err.message || "Failed to fetch goals";
         console.error("Goals fetch error:", errorMsg);
-        setError(errorMsg);
       } finally {
         setLoading(false);
       }
     };
     fetchGoals();
-  }, []);
+  }, [initialGoals, initialLoading, initialError]);
 
   // ── Actions ───────────────────────────────────────
   const handleCreate = async () => {

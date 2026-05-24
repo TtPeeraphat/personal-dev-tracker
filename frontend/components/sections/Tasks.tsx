@@ -4,11 +4,17 @@ import { tasksApi, Task } from "@/lib/api";
 import { S, modalOverlay, modalBox, labelStyle } from "@/constants/styles";
 import { Tabs } from "@/components/ui/Tabs";
 
+interface TasksProps {
+  tasks?: Task[];
+  loading?: boolean;
+  error?: string | null;
+}
+
 // ── แก้ Tasks component ───────────────────────────────
-export function Tasks() {
-  const [tasks, setTasks]     = useState<Task[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError]     = useState("");
+export function Tasks({ tasks: initialTasks, loading: initialLoading, error: initialError }: TasksProps = {}) {
+  const [tasks, setTasks]     = useState<Task[]>(initialTasks || []);
+  const [loading, setLoading] = useState(initialLoading ?? true);
+  const [error, setError]     = useState<string | null>(initialError || "");
   const [activeTab, setActiveTab]       = useState("All Tasks");
   const [activeFilter, setActiveFilter] = useState("All");
 
@@ -38,6 +44,13 @@ export function Tasks() {
 
   // ── ดึงข้อมูลจาก Backend ──────────────────────────
   useEffect(() => {
+    // Skip refetch if data was passed via props
+    if (initialTasks && initialTasks.length > 0) {
+      setTasks(initialTasks);
+      setLoading(initialLoading ?? false);
+      return;
+    }
+
     const fetchTasks = async () => {
       try {
         setLoading(true);
@@ -50,7 +63,7 @@ export function Tasks() {
       }
     };
     fetchTasks();
-  }, []);
+  }, [initialTasks, initialLoading, initialError]);
 
   // ── กรองข้อมูล ────────────────────────────────────
   const today = new Date().toISOString().split("T")[0];

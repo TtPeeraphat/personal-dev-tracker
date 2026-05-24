@@ -4,9 +4,13 @@ import { useState, useMemo } from "react";
 import { S, REPORT_VALS } from "@/constants/styles";
 import { Tabs } from "@/components/ui/Tabs";
 import { MiniChart } from "@/components/ui/MiniChart";
-import { useTasks } from "@/hooks/useTasks";
-import { useGoals } from "@/hooks/useGoals";
-import { useHabits } from "@/hooks/useHabits";
+import type { Task, Goal, Habit } from "@/types";
+
+interface ReportsProps {
+  tasks?: Task[];
+  goals?: Goal[];
+  habits?: Habit[];
+}
 
 // Helper: Get date range for calculations
 const getDateRange = (days: number) => {
@@ -16,9 +20,8 @@ const getDateRange = (days: number) => {
 };
 
 // Helper: Calculate stats from real data
-const calculateStats = (tasks: any[], goals: any[], habits: any[]) => {
+const calculateStats = (tasks: Task[], goals: Goal[], habits: Habit[]) => {
   const { start: weekStart } = getDateRange(7);
-  const { start: monthStart } = getDateRange(30);
 
   // Tasks completed this week
   const weekTasksCompleted = tasks.filter(t => 
@@ -82,102 +85,93 @@ const calculateStats = (tasks: any[], goals: any[], habits: any[]) => {
   };
 };
 
-export function Reports() {
+export function Reports({ tasks: propTasks, goals: propGoals, habits: propHabits }: ReportsProps = {}) {
   const [activeTab, setActiveTab] = useState("Weekly Summary");
   const tabs = ["Weekly Summary", "Monthly Overview", "Progress Charts"];
   
-  const { tasks, loading: tasksLoading } = useTasks();
-  const { goals, loading: goalsLoading } = useGoals();
-  const { habits, loading: habitsLoading } = useHabits();
+  const tasks = propTasks || [];
+  const goals = propGoals || [];
+  const habits = propHabits || [];
 
   const stats = useMemo(() => calculateStats(tasks, goals, habits), [tasks, goals, habits]);
-
-  const isLoading = tasksLoading || goalsLoading || habitsLoading;
 
 
   return (
     <div>
       <Tabs tabs={tabs} active={activeTab} onChange={setActiveTab} />
+      <div style={S.grid4}>
+        <div style={S.metric}>
+          <div style={S.metricLabel}>Tasks Completed</div>
+          <div style={S.metricVal}>{stats.weekTasksCompleted}</div>
+          <div style={S.metricSub}>this week</div>
+        </div>
+        <div style={S.metric}>
+          <div style={S.metricLabel}>Habit Rate</div>
+          <div style={S.metricVal}>{stats.habitRate}<span style={{ fontSize: 14, color: "#888780" }}>%</span></div>
+          <div style={S.metricSub}>today's completion</div>
+        </div>
+        <div style={S.metric}>
+          <div style={S.metricLabel}>Completion Rate</div>
+          <div style={S.metricVal}>{stats.completionRate}<span style={{ fontSize: 14, color: "#888780" }}>%</span></div>
+          <div style={S.metricSub}>overall</div>
+        </div>
+        <div style={S.metric}>
+          <div style={S.metricLabel}>Goal Progress</div>
+          <div style={S.metricVal}>{stats.avgGoalProgress}<span style={{ fontSize: 14, color: "#888780" }}>%</span></div>
+          <div style={S.metricSub}>avg all goals</div>
+        </div>
+      </div>
 
-      {isLoading ? (
-        <div style={{ padding: 24, textAlign: "center", color: "#888780" }}>Loading reports...</div>
-      ) : (
-        <>
-          <div style={S.grid4}>
-            <div style={S.metric}>
-              <div style={S.metricLabel}>Tasks Completed</div>
-              <div style={S.metricVal}>{stats.weekTasksCompleted}</div>
-              <div style={S.metricSub}>this week</div>
+      <div style={{ ...S.grid2, marginBottom: 16 }}>
+        <div style={S.card}>
+          <div style={S.cardTitle}>Task completion by day</div>
+          <MiniChart vals={REPORT_VALS} highlightIdx={3} height={80} />
+        </div>
+        <div style={S.card}>
+          <div style={S.cardTitle}>Category breakdown</div>
+          {stats.cats.map((c) => (
+            <div key={c.label} style={{ marginBottom: 12 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 4 }}>
+                <span>{c.label}</span>
+                <span style={{ fontFamily: "monospace" }}>{c.pct}%</span>
+              </div>
+              <div style={{ height: 6, background: "#F4F4F0", borderRadius: 3 }}>
+                <div style={{ height: "100%", width: `${c.pct}%`, background: c.color, borderRadius: 3 }} />
+              </div>
             </div>
-            <div style={S.metric}>
-              <div style={S.metricLabel}>Habit Rate</div>
-              <div style={S.metricVal}>{stats.habitRate}<span style={{ fontSize: 14, color: "#888780" }}>%</span></div>
-              <div style={S.metricSub}>today's completion</div>
-            </div>
-            <div style={S.metric}>
-              <div style={S.metricLabel}>Completion Rate</div>
-              <div style={S.metricVal}>{stats.completionRate}<span style={{ fontSize: 14, color: "#888780" }}>%</span></div>
-              <div style={S.metricSub}>overall</div>
-            </div>
-            <div style={S.metric}>
-              <div style={S.metricLabel}>Goal Progress</div>
-              <div style={S.metricVal}>{stats.avgGoalProgress}<span style={{ fontSize: 14, color: "#888780" }}>%</span></div>
-              <div style={S.metricSub}>avg all goals</div>
-            </div>
-          </div>
+          ))}
+        </div>
+      </div>
 
-          <div style={{ ...S.grid2, marginBottom: 16 }}>
-            <div style={S.card}>
-              <div style={S.cardTitle}>Task completion by day</div>
-              <MiniChart vals={REPORT_VALS} highlightIdx={3} height={80} />
-            </div>
-            <div style={S.card}>
-              <div style={S.cardTitle}>Category breakdown</div>
-              {stats.cats.map((c) => (
-                <div key={c.label} style={{ marginBottom: 12 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 4 }}>
-                    <span>{c.label}</span>
-                    <span style={{ fontFamily: "monospace" }}>{c.pct}%</span>
-                  </div>
-                  <div style={{ height: 6, background: "#F4F4F0", borderRadius: 3 }}>
-                    <div style={{ height: "100%", width: `${c.pct}%`, background: c.color, borderRadius: 3 }} />
-                  </div>
-                </div>
-              ))}
-            </div>
+      <div style={S.card}>
+        <div style={S.cardTitle}>Weekly Stats</div>
+        <div style={{ columns: 2, columnGap: 24 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "0.5px solid rgba(0,0,0,0.06)", breakInside: "avoid" }}>
+            <span style={{ fontSize: 12, color: "#5F5E5A" }}>Top habit</span>
+            <span style={{ fontFamily: "monospace", fontSize: 13, fontWeight: 500 }}>{stats.topHabit}</span>
           </div>
-
-          <div style={S.card}>
-            <div style={S.cardTitle}>Weekly Stats</div>
-            <div style={{ columns: 2, columnGap: 24 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "0.5px solid rgba(0,0,0,0.06)", breakInside: "avoid" }}>
-                <span style={{ fontSize: 12, color: "#5F5E5A" }}>Top habit</span>
-                <span style={{ fontFamily: "monospace", fontSize: 13, fontWeight: 500 }}>{stats.topHabit}</span>
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "0.5px solid rgba(0,0,0,0.06)", breakInside: "avoid" }}>
-                <span style={{ fontSize: 12, color: "#5F5E5A" }}>Tasks added</span>
-                <span style={{ fontFamily: "monospace", fontSize: 13, fontWeight: 500 }}>{stats.weekTasksAdded}</span>
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "0.5px solid rgba(0,0,0,0.06)", breakInside: "avoid" }}>
-                <span style={{ fontSize: 12, color: "#5F5E5A" }}>Tasks completed</span>
-                <span style={{ fontFamily: "monospace", fontSize: 13, fontWeight: 500 }}>{stats.weekTasksCompleted}</span>
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "0.5px solid rgba(0,0,0,0.06)", breakInside: "avoid" }}>
-                <span style={{ fontSize: 12, color: "#5F5E5A" }}>Completion rate</span>
-                <span style={{ fontFamily: "monospace", fontSize: 13, fontWeight: 500 }}>{stats.completionRate}%</span>
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "0.5px solid rgba(0,0,0,0.06)", breakInside: "avoid" }}>
-                <span style={{ fontSize: 12, color: "#5F5E5A" }}>Active habits</span>
-                <span style={{ fontFamily: "monospace", fontSize: 13, fontWeight: 500 }}>{habits.length}</span>
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "0.5px solid rgba(0,0,0,0.06)", breakInside: "avoid" }}>
-                <span style={{ fontSize: 12, color: "#5F5E5A" }}>Active goals</span>
-                <span style={{ fontFamily: "monospace", fontSize: 13, fontWeight: 500 }}>{goals.filter(g => g.status === 'active').length}</span>
-              </div>
-            </div>
+          <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "0.5px solid rgba(0,0,0,0.06)", breakInside: "avoid" }}>
+            <span style={{ fontSize: 12, color: "#5F5E5A" }}>Tasks added</span>
+            <span style={{ fontFamily: "monospace", fontSize: 13, fontWeight: 500 }}>{stats.weekTasksAdded}</span>
           </div>
-        </>
-      )}
+          <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "0.5px solid rgba(0,0,0,0.06)", breakInside: "avoid" }}>
+            <span style={{ fontSize: 12, color: "#5F5E5A" }}>Tasks completed</span>
+            <span style={{ fontFamily: "monospace", fontSize: 13, fontWeight: 500 }}>{stats.weekTasksCompleted}</span>
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "0.5px solid rgba(0,0,0,0.06)", breakInside: "avoid" }}>
+            <span style={{ fontSize: 12, color: "#5F5E5A" }}>Completion rate</span>
+            <span style={{ fontFamily: "monospace", fontSize: 13, fontWeight: 500 }}>{stats.completionRate}%</span>
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "0.5px solid rgba(0,0,0,0.06)", breakInside: "avoid" }}>
+            <span style={{ fontSize: 12, color: "#5F5E5A" }}>Active habits</span>
+            <span style={{ fontFamily: "monospace", fontSize: 13, fontWeight: 500 }}>{habits.length}</span>
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "0.5px solid rgba(0,0,0,0.06)", breakInside: "avoid" }}>
+            <span style={{ fontSize: 12, color: "#5F5E5A" }}>Active goals</span>
+            <span style={{ fontFamily: "monospace", fontSize: 13, fontWeight: 500 }}>{goals.filter(g => g.status === 'active').length}</span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

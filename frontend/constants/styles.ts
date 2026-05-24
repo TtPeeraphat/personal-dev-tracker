@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import type { Task, Goal, Habit, JournalEntry, NavItem } from "@/types";
+import type { Task, Goal, JournalEntry, NavItem } from "@/types";
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 

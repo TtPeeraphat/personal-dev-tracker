@@ -3,9 +3,15 @@ import { habitsApi, Habit } from "@/lib/api";
 import { S, modalOverlay, modalBox, labelStyle } from "@/constants/styles";
 import { Tabs } from "@/components/ui/Tabs";
 
-export function Habits() {
-  const [habits, setHabits]   = useState<Habit[]>([]);
-  const [loading, setLoading] = useState(true);
+interface HabitsProps {
+  habits?: Habit[];
+  loading?: boolean;
+  error?: string | null;
+}
+
+export function Habits({ habits: initialHabits, loading: initialLoading, error: initialError }: HabitsProps = {}) {
+  const [habits, setHabits]   = useState<Habit[]>(initialHabits || []);
+  const [loading, setLoading] = useState(initialLoading ?? true);
   const [activeTab, setActiveTab] = useState("Today's Habits");
   const [showModal, setShowModal] = useState(false);
   const [newHabit, setNewHabit] = useState({
@@ -28,6 +34,13 @@ export function Habits() {
 
   // ── ดึงข้อมูล ─────────────────────────────────────
   useEffect(() => {
+    // Skip refetch if data was passed via props
+    if (initialHabits && initialHabits.length > 0) {
+      setHabits(initialHabits);
+      setLoading(initialLoading ?? false);
+      return;
+    }
+
     const fetchHabits = async () => {
       try {
         const data = await habitsApi.getAll();
@@ -39,7 +52,7 @@ export function Habits() {
       }
     };
     fetchHabits();
-  }, []);
+  }, [initialHabits, initialLoading, initialError]);
 
   const today = new Date().toISOString().split("T")[0];
 

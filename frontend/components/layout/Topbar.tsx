@@ -10,6 +10,9 @@ import type { Task, Habit, Goal } from "@/types";
 interface TopbarProps {
   section: string;
   setSection: (s: string) => void;
+  tasks?: Task[];
+  habits?: Habit[];
+  goals?: Goal[];
 }
 
 const TITLES: Record<string, string> = {
@@ -32,13 +35,19 @@ const ACTION_LABELS: Record<string, string | null> = {
   settings:  null,
 };
 
-export function Topbar({ section, setSection }: TopbarProps) {
+export function Topbar({ section, setSection, tasks: propTasks, habits: propHabits, goals: propGoals }: TopbarProps) {
   const actionLabel = ACTION_LABELS[section];
 
-  // Live Hooks for Search & Notifications
-  const { tasks } = useTasks();
-  const { habits } = useHabits();
-  const { goals } = useGoals();
+  // Use passed-in data or fetch fresh data
+  const hookData = {
+    tasks: useTasks(),
+    habits: useHabits(),
+    goals: useGoals(),
+  };
+
+  const tasks = propTasks || hookData.tasks.tasks;
+  const habits = propHabits || hookData.habits.habits;
+  const goals = propGoals || hookData.goals.goals;
 
   // Search States
   const [showSearch, setShowSearch] = useState(false);

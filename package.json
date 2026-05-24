@@ -1,5 +1,15 @@
 {
-  "dependencies": {
-    "mongodb": "^7.2.0"
+  "name": "personal-dev-tracker",
+  "version": "1.0.0",
+  "description": "Full-stack personal development tracker",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"cd backend && npm run dev\" \"cd frontend && npm run dev\"",
+    "build": "npm run build --workspace=frontend",
+    "start": "npm run start --workspace=frontend",
+    "install:all": "npm install && npm install --prefix backend && npm install --prefix frontend"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
   }
 }
