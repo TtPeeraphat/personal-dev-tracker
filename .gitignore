@@ -1,28 +1,22 @@
-# ข้ามไฟล์เฉพาะเจาะจง (เช่น ไฟล์เก็บความลับ Environment)
+# Environment — ห้าม commit ข้อมูลลับเด็ดขาด
 .env
 .env.local
+.env.production
 
-# ข้ามทั้งโฟลเดอร์ (ใส่ / ไว้ด้านหลัง)
+# Dependencies
 node_modules/
-.venv/
+frontend/node_modules/
+backend/node_modules/
+
+# Build outputs
 dist/
 build/
+frontend/.next/
+backend/dist/
 
-# ข้ามไฟล์ตามนามสกุล (เช่น ไฟล์ Log ทั้งหมด)
+# Logs
 *.log
 
-# ข้ามไฟล์ที่สร้างโดย OS อัตโนมัติ
+# OS
 .DS_Store
 Thumbs.db
-
-echo "node_modules/" >> .gitignore
-echo ".env" >> .gitignore
-echo ".next/" >> .gitignore
-
-# Next.js
-frontend/.next/
-frontend/node_modules/
-
-# Backend
-backend/dist/
-backend/node_modules/
