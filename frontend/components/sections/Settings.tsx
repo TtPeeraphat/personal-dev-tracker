@@ -206,7 +206,7 @@ export function Settings() {
             justifyContent: "space-between", padding: "10px 0" }}>
             <div>
               <div style={{ fontSize: 13 }}>Dark mode</div>
-              <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 2 }}>>
+              <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 2 }}>
                 {dark ? "Dark theme active" : "Light theme active"}
               </div>
             </div>
