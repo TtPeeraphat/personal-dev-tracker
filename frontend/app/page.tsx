@@ -17,6 +17,7 @@ import { useTasks }  from "@/hooks/useTasks";
 import { useHabits } from "@/hooks/useHabits";
 import { useGoals }  from "@/hooks/useGoals";
 import { useIsMobile } from "@/hooks/useIsMobile";
+import { NAV } from "@/constants/styles";
 
 // ── Main app shell — แสดงเมื่อยืนยัน token แล้วเท่านั้น ────────────────
 function PersonalDevTracker() {
