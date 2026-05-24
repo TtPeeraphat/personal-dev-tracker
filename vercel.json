@@ -5,7 +5,7 @@
   "env": {
     "NEXT_PUBLIC_API_URL": {
       "description": "API endpoint for frontend",
-      "default": "https://api.yourdomain.com"
+      "default": "https://personal-dev-tracker.onrender.com"
     }
   },
   "routes": [
