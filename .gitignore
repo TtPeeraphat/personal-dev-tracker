@@ -18,3 +18,11 @@ Thumbs.db
 echo "node_modules/" >> .gitignore
 echo ".env" >> .gitignore
 echo ".next/" >> .gitignore
+
+# Next.js
+frontend/.next/
+frontend/node_modules/
+
+# Backend
+backend/dist/
+backend/node_modules/
