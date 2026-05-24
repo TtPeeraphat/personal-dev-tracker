@@ -66,7 +66,7 @@ NEXT_PUBLIC_API_URL=http://localhost:5000
 
 ### Frontend (.env.production)
 ```
-NEXT_PUBLIC_API_URL=https://api.yourdomain.com
+NEXT_PUBLIC_API_URL=personal-dev-tracker.vercel.app
 ```
 
 ### Backend (.env)
@@ -75,8 +75,8 @@ PORT=5000
 MONGO_URI=mongodb+srv://user:pass@cluster.mongodb.net/db
 JWT_SECRET=your-secret-key
 NODE_ENV=production
-ALLOWED_ORIGIN=https://your-app.vercel.app
-FRONTEND_URL=https://your-app.vercel.app
+ALLOWED_ORIGIN=personal-dev-tracker.vercel.app
+FRONTEND_URL=personal-dev-tracker.vercel.app
 ```
 
 ## Vercel Deployment
