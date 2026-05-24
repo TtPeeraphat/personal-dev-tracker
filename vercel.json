@@ -1,18 +1,5 @@
 {
   "version": 2,
-  "buildCommand": "cd frontend && npm run build",
-  "outputDirectory": "frontend/.next",
-  "env": {
-    "NEXT_PUBLIC_API_URL": "https://personal-dev-tracker.onrender.com"
-  },
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/",
-      "status": 404,
-      "continue": true
-    }
-  ],
   "rewrites": [
     {
       "source": "/(.*)",
