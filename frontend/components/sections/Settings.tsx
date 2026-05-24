@@ -64,12 +64,8 @@ export function Settings() {
   useEffect(() => {
     const root = document.documentElement;
     if (dark) {
-      root.style.setProperty("--background", "#0a0a0a");
-      root.style.setProperty("--foreground", "#ededed");
       root.setAttribute("data-theme", "dark");
     } else {
-      root.style.setProperty("--background", "#ffffff");
-      root.style.setProperty("--foreground", "#171717");
       root.setAttribute("data-theme", "light");
     }
     localStorage.setItem("devtrack_theme", JSON.stringify(dark));
@@ -133,14 +129,14 @@ export function Settings() {
               <div style={{ fontWeight: 500, fontSize: 14 }}>
                 {profile.firstName} {profile.lastName}
               </div>
-              <div style={{ fontSize: 12, color: "#888780" }}>{profile.email || "—"}</div>
+              <div style={{ fontSize: 11, color: "var(--muted)" }}>{profile.email || "—"}</div>
             </div>
           </div>
 
           <div style={{ display: "flex", gap: 10, marginBottom: 10 }}>
             {[["First name", "firstName", "Anya"], ["Last name", "lastName", "Petrova"]].map(([label, key, ph]) => (
               <div key={key} style={{ flex: 1 }}>
-                <div style={{ fontSize: 11, color: "#888780", marginBottom: 4 }}>{label}</div>
+                <div style={{ fontSize: 11, color: "var(--muted)", marginBottom: 4 }}>{label}</div>
                 <input
                   style={S.input}
                   value={(profile as any)[key]}
@@ -153,7 +149,7 @@ export function Settings() {
 
           {[["Email address", "email", "you@example.com"], ["Timezone", "timezone", "Asia/Bangkok (UTC+7)"]].map(([label, key, ph]) => (
             <div key={key} style={{ marginBottom: 10 }}>
-              <div style={{ fontSize: 11, color: "#888780", marginBottom: 4 }}>{label}</div>
+              <div style={{ fontSize: 11, color: "var(--muted)", marginBottom: 4 }}>{label}</div>
               <input
                 style={S.input}
                 value={(profile as any)[key]}
@@ -174,10 +170,10 @@ export function Settings() {
           {NOTIFICATION_ITEMS.map(({ k, label, desc }) => (
             <div key={k} style={{ display: "flex", alignItems: "center",
               justifyContent: "space-between", padding: "10px 0",
-              borderBottom: "0.5px solid rgba(0,0,0,0.06)" }}>
+              borderBottom: "0.5px solid var(--border)" }}>
               <div>
                 <div style={{ fontSize: 13 }}>{label}</div>
-                <div style={{ fontSize: 11, color: "#888780", marginTop: 2 }}>{desc}</div>
+                <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 2 }}>{desc}</div>
               </div>
               <Toggle on={notifs[k]} onToggle={() => toggleNotif(k)} />
             </div>
@@ -193,10 +189,10 @@ export function Settings() {
           {PREFERENCE_ITEMS.map(({ k, label, desc }) => (
             <div key={k} style={{ display: "flex", alignItems: "center",
               justifyContent: "space-between", padding: "10px 0",
-              borderBottom: "0.5px solid rgba(0,0,0,0.06)" }}>
+              borderBottom: "0.5px solid var(--border)" }}>
               <div>
                 <div style={{ fontSize: 13 }}>{label}</div>
-                <div style={{ fontSize: 11, color: "#888780", marginTop: 2 }}>{desc}</div>
+                <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 2 }}>{desc}</div>
               </div>
               <Toggle on={prefs[k]} onToggle={() => togglePref(k)} />
             </div>
@@ -210,7 +206,7 @@ export function Settings() {
             justifyContent: "space-between", padding: "10px 0" }}>
             <div>
               <div style={{ fontSize: 13 }}>Dark mode</div>
-              <div style={{ fontSize: 11, color: "#888780", marginTop: 2 }}>
+              <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 2 }}>>
                 {dark ? "Dark theme active" : "Light theme active"}
               </div>
             </div>

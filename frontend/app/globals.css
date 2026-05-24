@@ -1,11 +1,21 @@
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background:   #FAFAF8;
+  --foreground:   #1a1a18;
+  --surface:      #ffffff;
+  --surface-alt:  #F4F4F0;
+  --border:       rgba(0, 0, 0, 0.08);
+  --muted:        #888780;
+  --fg-muted:     #5F5E5A;
 }
 
 [data-theme="dark"] {
-  --background: #0a0a0a;
-  --foreground: #ededed;
+  --background:   #0f0f0d;
+  --foreground:   #ededed;
+  --surface:      #1c1c1a;
+  --surface-alt:  #252522;
+  --border:       rgba(255, 255, 255, 0.08);
+  --muted:        #6b6b68;
+  --fg-muted:     #a8a8a4;
 }
 
 * {

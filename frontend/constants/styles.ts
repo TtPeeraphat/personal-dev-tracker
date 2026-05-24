@@ -57,18 +57,18 @@ export const S: Record<string, any> = {
   app: {
     display: "flex", height: "100vh",
     fontFamily: "'DM Sans', system-ui, sans-serif",
-    fontSize: 14, background: "#FAFAF8", color: "#1a1a18", overflow: "hidden",
+    fontSize: 14, background: "var(--background)", color: "var(--foreground)", overflow: "hidden",
   } as CSSProperties,
 
   sidebar: {
-    width: 220, background: "#fff",
-    borderRight: "0.5px solid rgba(0,0,0,0.08)",
+    width: 220, background: "var(--surface)",
+    borderRight: "0.5px solid var(--border)",
     display: "flex", flexDirection: "column", flexShrink: 0,
   } as CSSProperties,
 
-  logo: { padding: "20px 18px 16px", borderBottom: "0.5px solid rgba(0,0,0,0.08)" } as CSSProperties,
-  logoText: { fontFamily: "Georgia, serif", fontSize: 17, fontStyle: "italic", color: "#1a1a18", letterSpacing: "-0.02em" } as CSSProperties,
-  logoSub: { fontFamily: "monospace", fontSize: 11, color: "#888780", marginTop: 2 } as CSSProperties,
+  logo: { padding: "20px 18px 16px", borderBottom: "0.5px solid var(--border)" } as CSSProperties,
+  logoText: { fontFamily: "Georgia, serif", fontSize: 17, fontStyle: "italic", color: "var(--foreground)", letterSpacing: "-0.02em" } as CSSProperties,
+  logoSub: { fontFamily: "monospace", fontSize: 11, color: "var(--muted)", marginTop: 2 } as CSSProperties,
 
   navSection: {
     padding: "12px 14px 4px", fontSize: 10, fontWeight: 600,
@@ -103,9 +103,9 @@ export const S: Record<string, any> = {
   main: { flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" } as CSSProperties,
 
   topbar: {
-    padding: "13px 24px", borderBottom: "0.5px solid rgba(0,0,0,0.08)",
+    padding: "13px 24px", borderBottom: "0.5px solid var(--border)",
     display: "flex", alignItems: "center", gap: 10,
-    background: "#fff", flexShrink: 0,
+    background: "var(--surface)", flexShrink: 0,
   } as CSSProperties,
 
   pageTitle: {
@@ -115,9 +115,9 @@ export const S: Record<string, any> = {
 
   btn: (primary: boolean): CSSProperties => ({
     padding: "6px 14px", borderRadius: 7,
-    border: primary ? "none" : "0.5px solid rgba(0,0,0,0.12)",
-    background: primary ? "#1D9E75" : "#fff",
-    color: primary ? "#fff" : "#5F5E5A",
+    border: primary ? "none" : "0.5px solid var(--border)",
+    background: primary ? "#1D9E75" : "var(--surface)",
+    color: primary ? "#fff" : "var(--fg-muted)",
     fontSize: 12, cursor: "pointer",
     display: "flex", alignItems: "center", gap: 5,
     fontFamily: "inherit",
@@ -129,7 +129,7 @@ export const S: Record<string, any> = {
   grid4: { display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 18 } as CSSProperties,
 
   card: {
-    background: "#fff", border: "0.5px solid rgba(0,0,0,0.08)",
+    background: "var(--surface)", border: "0.5px solid var(--border)",
     borderRadius: 12, padding: "16px 18px",
   } as CSSProperties,
 
@@ -140,10 +140,10 @@ export const S: Record<string, any> = {
     justifyContent: "space-between",
   } as CSSProperties,
 
-  metric: { background: "#F4F4F0", borderRadius: 9, padding: "14px 16px" } as CSSProperties,
-  metricLabel: { fontSize: 11, color: "#888780", marginBottom: 5 } as CSSProperties,
-  metricVal: { fontFamily: "monospace", fontSize: 24, fontWeight: 600, color: "#1a1a18", lineHeight: 1 } as CSSProperties,
-  metricSub: { fontSize: 11, color: "#888780", marginTop: 4 } as CSSProperties,
+  metric: { background: "var(--surface-alt)", borderRadius: 9, padding: "14px 16px" } as CSSProperties,
+  metricLabel: { fontSize: 11, color: "var(--muted)", marginBottom: 5 } as CSSProperties,
+  metricVal: { fontFamily: "monospace", fontSize: 24, fontWeight: 600, color: "var(--foreground)", lineHeight: 1 } as CSSProperties,
+  metricSub: { fontSize: 11, color: "var(--muted)", marginTop: 4 } as CSSProperties,
 
   progressBar: { height: 5, background: "#E1F5EE", borderRadius: 3, overflow: "hidden", marginTop: 6 } as CSSProperties,
   progressFill: (pct: number, h?: string | number): CSSProperties => ({
@@ -206,25 +206,25 @@ export const S: Record<string, any> = {
 
   input: {
     padding: "7px 11px", borderRadius: 7,
-    border: "0.5px solid rgba(0,0,0,0.12)",
-    background: "#fff", fontSize: 13, color: "#1a1a18",
+    border: "0.5px solid var(--border)",
+    background: "var(--surface)", fontSize: 13, color: "var(--foreground)",
     outline: "none", width: "100%", fontFamily: "inherit",
   } as CSSProperties,
 
   iconBtn: {
     width: 28, height: 28, borderRadius: 6,
-    border: "0.5px solid rgba(0,0,0,0.1)",
-    background: "#fff", cursor: "pointer",
+    border: "0.5px solid var(--border)",
+    background: "var(--surface)", cursor: "pointer",
     display: "flex", alignItems: "center",
-    justifyContent: "center", color: "#888780", fontSize: 14,
+    justifyContent: "center", color: "var(--muted)", fontSize: 14,
   } as CSSProperties,
 
   moodChip: (sel: boolean): CSSProperties => ({
     padding: "6px 12px", borderRadius: 20,
-    border: `0.5px solid ${sel ? "#9FE1CB" : "rgba(0,0,0,0.1)"}`,
+    border: `0.5px solid ${sel ? "#9FE1CB" : "var(--border)"}`,
     cursor: "pointer", fontSize: 12,
-    background: sel ? "#E1F5EE" : "#fff",
-    color: sel ? "#0F6E56" : "#5F5E5A",
+    background: sel ? "#E1F5EE" : "var(--surface)",
+    color: sel ? "#0F6E56" : "var(--fg-muted)",
   }),
 };
 
@@ -235,7 +235,7 @@ export const modalOverlay: CSSProperties = {
 };
 
 export const modalBox: CSSProperties = {
-  background: "#fff", padding: 24, borderRadius: 12,
+  background: "var(--surface)", padding: 24, borderRadius: 12,
   width: "100%", maxWidth: 400,
 };
 
