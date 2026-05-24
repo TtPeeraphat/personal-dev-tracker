@@ -21,7 +21,7 @@ export function Dashboard({ tasks, habits, goals, setSection, isMobile }: {
   return (
     <div>
       {/* Metrics */}
-      <div style={S.grid4}>
+      <div style={S.grid4(isMobile)}>
         <div style={S.metric}>
           <div style={S.metricLabel}>Tasks Today</div>
           <div style={S.metricVal}>{todayTasks.length}</div>
@@ -56,7 +56,7 @@ export function Dashboard({ tasks, habits, goals, setSection, isMobile }: {
         </div>
       </div>
 
-      <div style={{ ...S.grid2, marginBottom: 16 }}>
+      <div style={{ ...S.grid2(isMobile), marginBottom: 16 }}>
         {/* Today's Tasks */}
         <div style={S.card}>
           <div style={S.cardTitle}>
