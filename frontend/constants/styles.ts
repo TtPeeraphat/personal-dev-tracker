@@ -125,9 +125,19 @@ export const S: Record<string, any> = {
 
   content: { flex: 1, overflowY: "auto", padding: "22px 24px" } as CSSProperties,
 
-  grid2: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 } as CSSProperties,
-  grid4: { display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 18 } as CSSProperties,
+grid2: (mobile: boolean): CSSProperties => ({
+  display: "grid",
+  gridTemplateColumns: mobile ? "1fr" : "1fr 1fr",
+  gap: 16,
+  marginBottom: 16,
+}),
 
+grid4: (mobile: boolean): CSSProperties => ({
+  display: "grid",
+  gridTemplateColumns: mobile ? "1fr 1fr" : "repeat(4,1fr)",
+  gap: 12,
+  marginBottom: 18,
+}),
   card: {
     background: "var(--surface)", border: "0.5px solid var(--border)",
     borderRadius: 12, padding: "16px 18px",

@@ -1,13 +1,10 @@
 import { S } from "@/constants/styles";
 import { Task, Habit, Goal } from "@/lib/api";
 
-export function Dashboard({
-  tasks, habits, goals, setSection,
-}: {
-  tasks:      Task[];
-  habits:     Habit[];
-  goals:      Goal[];
+export function Dashboard({ tasks, habits, goals, setSection, isMobile }: {
+  tasks: Task[]; habits: Habit[]; goals: Goal[];
   setSection: (s: string) => void;
+  isMobile?: boolean;
 }) {
   const today      = new Date().toISOString().split("T")[0];
   const todayTasks = tasks.filter(t => t.dueDate?.startsWith(today));

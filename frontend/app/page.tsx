@@ -16,15 +16,18 @@ import { Journal }   from "@/components/sections/Journal";
 import { useTasks }  from "@/hooks/useTasks";
 import { useHabits } from "@/hooks/useHabits";
 import { useGoals }  from "@/hooks/useGoals";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 // ── Main app shell — แสดงเมื่อยืนยัน token แล้วเท่านั้น ────────────────
 function PersonalDevTracker() {
-  const [activeSection, setActiveSection] = useState("dashboard");
+  const isMobile = useIsMobile()
+  const [activeSection, setActiveSection] = useState("dashboard")
 
   // Lift state ขึ้นมาที่นี่ เพื่อแชร์ข้อมูลกับ Dashboard โดยไม่ต้อง fetch ซ้ำ
   const taskProps  = useTasks();
   const habitProps = useHabits();
   const goalProps  = useGoals();
+  
 
   const renderSection = () => {
     switch (activeSection) {
@@ -35,6 +38,7 @@ function PersonalDevTracker() {
             habits={habitProps.habits}
             goals={goalProps.goals}
             setSection={setActiveSection}
+            isMobile={isMobile}
           />
         );
       // ส่ง props ลงไปเพื่อให้ section components ใช้ข้อมูลที่ดึงมาแล้ว
@@ -59,7 +63,11 @@ function PersonalDevTracker() {
 
   return (
     <div style={S.app}>
-      <Sidebar section={activeSection} setSection={setActiveSection} />
+      {/* ซ่อน sidebar บน mobile */}
+      {!isMobile && (
+        <Sidebar section={activeSection} setSection={setActiveSection} />
+      )}
+      
       <div style={S.main}>
         <Topbar
           section={activeSection}
@@ -69,12 +77,36 @@ function PersonalDevTracker() {
           habits={habitProps.habits}
           goals={goalProps.goals}
         />
-        <div style={S.content}>
+        <div style={{ ...S.content, padding: isMobile ? "16px 12px" : "22px 24px" }}>
           {renderSection()}
         </div>
+       {/* Bottom Nav สำหรับ mobile */}
+        {isMobile && (
+          <div style={{
+            display: "flex", position: "fixed", bottom: 0, left: 0, right: 0,
+            background: "var(--surface)", borderTop: "0.5px solid var(--border)",
+            padding: "8px 0", zIndex: 50,
+          }}>
+            {NAV.slice(0, 5).map(item => (
+              <div
+                key={item.id}
+                onClick={() => setActiveSection(item.id)}
+                style={{
+                  flex: 1, display: "flex", flexDirection: "column",
+                  alignItems: "center", gap: 3, cursor: "pointer",
+                  color: activeSection === item.id ? "#1D9E75" : "#888780",
+                  fontSize: 10,
+                }}
+              >
+                <span style={{ fontSize: 18 }}>{item.icon}</span>
+                <span>{item.label}</span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
-  );
+  )
 }
 
 // ── Guard — ตรวจสอบ token กับ server ก่อนแสดงหน้าหลัก ──────────────────────
