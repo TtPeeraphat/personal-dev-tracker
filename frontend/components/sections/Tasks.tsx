@@ -1,4 +1,4 @@
-// ── เพิ่ม import ที่หัวไฟล์ ──────────────────────────
+// ── Tasks section component ──────────────────────────
 import { useState, useEffect } from "react";
 import { tasksApi, Task } from "@/lib/api";
 import { S, modalOverlay, modalBox, labelStyle } from "@/constants/styles";
@@ -8,14 +8,24 @@ interface TasksProps {
   tasks?: Task[];
   loading?: boolean;
   error?: string | null;
+  createTask?: (data: Partial<Task>) => Promise<Task>;
+  completeTask?: (id: string) => Promise<void>;
+  deleteTask?: (id: string) => Promise<void>;
 }
 
-// ── แก้ Tasks component ───────────────────────────────
-export function Tasks({ tasks: initialTasks, loading: initialLoading, error: initialError }: TasksProps = {}) {
-  const [tasks, setTasks]     = useState<Task[]>(initialTasks || []);
-  const [loading, setLoading] = useState(initialLoading ?? true);
-  const [error, setError]     = useState<string | null>(initialError || "");
-  const [activeTab, setActiveTab]       = useState("All Tasks");
+export function Tasks({
+  tasks: initialTasks,
+  loading: initialLoading,
+  error: initialError,
+  createTask: createTaskProp,
+  completeTask: completeTaskProp,
+  deleteTask: deleteTaskProp,
+}: TasksProps = {}) {
+
+  const [tasks, setTasks]             = useState<Task[]>(initialTasks || []);
+  const [loading, setLoading]         = useState(initialLoading ?? true);
+  const [error, setError]             = useState<string | null>(initialError ?? null);
+  const [activeTab, setActiveTab]     = useState("All Tasks");
   const [activeFilter, setActiveFilter] = useState("All");
 
   // Modal สำหรับสร้าง task ใหม่
@@ -85,10 +95,30 @@ export function Tasks({ tasks: initialTasks, loading: initialLoading, error: ini
     );
 
   // ── Actions ───────────────────────────────────────
+  const handleCreate = async () => {
+    if (!newTask.title.trim()) return;
+    try {
+      if (createTaskProp) {
+        await createTaskProp(newTask);
+      } else {
+        const created = await tasksApi.create(newTask);
+        setTasks(prev => [created, ...prev]);
+      }
+      setShowModal(false);
+      setNewTask({ title: "", priority: "medium", dueDate: "", tags: [] });
+    } catch (err: any) {
+      alert(err.message);
+    }
+  };
+
   const handleComplete = async (id: string) => {
     try {
-      const updated = await tasksApi.complete(id);
-      setTasks((prev) => prev.map((t) => t._id === id ? updated : t));
+      if (completeTaskProp) {
+        await completeTaskProp(id);
+      } else {
+        const updated = await tasksApi.complete(id);
+        setTasks(prev => prev.map(t => t._id === id ? updated : t));
+      }
     } catch (err: any) {
       alert(err.message);
     }
@@ -97,20 +127,12 @@ export function Tasks({ tasks: initialTasks, loading: initialLoading, error: ini
   const handleDelete = async (id: string) => {
     if (!confirm("ลบ task นี้?")) return;
     try {
-      await tasksApi.delete(id);
-      setTasks((prev) => prev.filter((t) => t._id !== id));
-    } catch (err: any) {
-      alert(err.message);
-    }
-  };
-
-  const handleCreate = async () => {
-    if (!newTask.title.trim()) return;
-    try {
-      const created = await tasksApi.create(newTask);
-      setTasks((prev) => [created, ...prev]);
-      setShowModal(false);
-      setNewTask({ title: "", priority: "medium", dueDate: "", tags: [] });
+      if (deleteTaskProp) {
+        await deleteTaskProp(id);
+      } else {
+        await tasksApi.delete(id);
+        setTasks(prev => prev.filter(t => t._id !== id));
+      }
     } catch (err: any) {
       alert(err.message);
     }

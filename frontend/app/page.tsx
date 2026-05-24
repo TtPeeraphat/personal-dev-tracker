@@ -101,6 +101,7 @@ export default function HomePage() {
         router.replace("/login");
       });
   }, [router]);
+  
 
   if (!ready) return null;
 

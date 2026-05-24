@@ -7,9 +7,19 @@ interface HabitsProps {
   habits?: Habit[];
   loading?: boolean;
   error?: string | null;
+  createHabit?: (data: Partial<Habit>) => Promise<Habit>;
+  deleteHabit?: (id: string) => Promise<void>;
+  logToday?: (id: string, data: { completed: boolean; note?: string }) => Promise<Habit>;
 }
 
-export function Habits({ habits: initialHabits, loading: initialLoading, error: initialError }: HabitsProps = {}) {
+export function Habits({
+  habits: initialHabits,
+  loading: initialLoading,
+  error: initialError,
+  createHabit: createHabitProp,
+  deleteHabit: deleteHabitProp,
+  logToday: logTodayProp,
+}: HabitsProps = {}) {
   const [habits, setHabits]   = useState<Habit[]>(initialHabits || []);
   const [loading, setLoading] = useState(initialLoading ?? true);
   const [activeTab, setActiveTab] = useState("Today's Habits");
@@ -34,13 +44,11 @@ export function Habits({ habits: initialHabits, loading: initialLoading, error: 
 
   // ── ดึงข้อมูล ─────────────────────────────────────
   useEffect(() => {
-    // Skip refetch if data was passed via props
     if (initialHabits && initialHabits.length > 0) {
       setHabits(initialHabits);
       setLoading(initialLoading ?? false);
       return;
     }
-
     const fetchHabits = async () => {
       try {
         const data = await habitsApi.getAll();
@@ -62,10 +70,15 @@ export function Habits({ habits: initialHabits, loading: initialLoading, error: 
   // ── Actions ───────────────────────────────────────
   const handleToggle = async (habit: Habit) => {
     try {
-      const updated = await habitsApi.logToday(habit._id, {
-        completed: !isTodayDone(habit),
-      });
-      setHabits(prev => prev.map(h => h._id === habit._id ? updated : h));
+      if (logTodayProp) {
+        const updated = await logTodayProp(habit._id, { completed: !isTodayDone(habit) });
+        setHabits(prev => prev.map(h => h._id === habit._id ? updated : h));
+      } else {
+        const updated = await habitsApi.logToday(habit._id, {
+          completed: !isTodayDone(habit),
+        });
+        setHabits(prev => prev.map(h => h._id === habit._id ? updated : h));
+      }
     } catch (err: any) {
       alert(err.message);
     }
@@ -74,8 +87,12 @@ export function Habits({ habits: initialHabits, loading: initialLoading, error: 
   const handleCreate = async () => {
     if (!newHabit.title.trim()) return;
     try {
-      const created = await habitsApi.create(newHabit);
-      setHabits(prev => [created, ...prev]);
+      if (createHabitProp) {
+        await createHabitProp(newHabit);
+      } else {
+        const created = await habitsApi.create(newHabit);
+        setHabits(prev => [created, ...prev]);
+      }
       setShowModal(false);
       setNewHabit({ title: "", icon: "⚡", color: "#1D9E75", frequency: "daily" });
     } catch (err: any) {
@@ -86,8 +103,12 @@ export function Habits({ habits: initialHabits, loading: initialLoading, error: 
   const handleDelete = async (id: string) => {
     if (!confirm("ลบ habit นี้?")) return;
     try {
-      await habitsApi.delete(id);
-      setHabits(prev => prev.filter(h => h._id !== id));
+      if (deleteHabitProp) {
+        await deleteHabitProp(id);
+      } else {
+        await habitsApi.delete(id);
+        setHabits(prev => prev.filter(h => h._id !== id));
+      }
     } catch (err: any) {
       alert(err.message);
     }
