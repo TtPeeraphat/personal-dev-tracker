@@ -167,6 +167,12 @@ export function Topbar({ section, setSection, tasks: propTasks, habits: propHabi
     if (section === "reports") {
       // For reports, we can trigger report export custom event
       window.dispatchEvent(new CustomEvent("trigger-export"));
+    } else if (section === "dashboard") {
+      // Navigate to tasks section first, then trigger modal after mount
+      setSection("tasks");
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent("trigger-create", { detail: { section: "tasks" } }));
+      }, 50);
     } else {
       // Dispatches general create event for specific sections
       window.dispatchEvent(new CustomEvent("trigger-create", { detail: { section } }));
