@@ -51,9 +51,9 @@ function PersonalDevTracker() {
       // ส่ง props ลงไปเพื่อให้ section components ใช้ข้อมูลที่ดึงมาแล้ว
       // แทนที่จะเรียก hook ใหม่ภายใน (ซึ่งจะทำให้ fetch ซ้ำ)
       case "tasks":   return <Tasks   {...taskProps}  />;
-      case "goals":   return <Goals   {...goalProps}  />;
-      case "habits":  return <Habits  {...habitProps} />;
-      case "reports": return <Reports tasks={taskProps.tasks} habits={habitProps.habits} goals={goalProps.goals} />;
+      case "goals":   return <Goals   {...goalProps} isMobile={isMobile} />;
+      case "habits":  return <Habits  {...habitProps} isMobile={isMobile} />;
+      case "reports": return <Reports tasks={taskProps.tasks} habits={habitProps.habits} goals={goalProps.goals} isMobile={isMobile} />;
       case "journal": return <Journal />;
       case "settings": return <Settings />;
       default:

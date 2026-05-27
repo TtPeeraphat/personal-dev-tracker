@@ -10,6 +10,7 @@ interface HabitsProps {
   createHabit?: (data: Partial<Habit>) => Promise<Habit>;
   deleteHabit?: (id: string) => Promise<void>;
   logToday?: (id: string, data: { completed: boolean; note?: string }) => Promise<Habit>;
+  isMobile?: boolean;
 }
 
 export function Habits({
@@ -19,6 +20,7 @@ export function Habits({
   createHabit: createHabitProp,
   deleteHabit: deleteHabitProp,
   logToday: logTodayProp,
+  isMobile,
 }: HabitsProps = {}) {
   const [habits, setHabits]   = useState<Habit[]>(initialHabits || []);
   const [loading, setLoading] = useState(initialLoading ?? true);
@@ -123,7 +125,7 @@ export function Habits({
         <button style={S.btn(true)} onClick={() => setShowModal(true)}>+ New Habit</button>
       </div>
 
-      <div style={S.grid2}>
+      <div style={S.grid2(isMobile)}>
         {/* Checklist วันนี้ */}
         <div style={S.card}>
           <div style={S.cardTitle}>

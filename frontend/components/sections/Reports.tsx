@@ -10,6 +10,7 @@ interface ReportsProps {
   tasks?: Task[];
   goals?: Goal[];
   habits?: Habit[];
+  isMobile?: boolean;
 }
 
 // Helper: Get date range for calculations
@@ -85,7 +86,7 @@ const calculateStats = (tasks: Task[], goals: Goal[], habits: Habit[]) => {
   };
 };
 
-export function Reports({ tasks: propTasks, goals: propGoals, habits: propHabits }: ReportsProps = {}) {
+export function Reports({ tasks: propTasks, goals: propGoals, habits: propHabits, isMobile }: ReportsProps = {}) {
   const [activeTab, setActiveTab] = useState("Weekly Summary");
   const tabs = ["Weekly Summary", "Monthly Overview", "Progress Charts"];
   
@@ -99,7 +100,7 @@ export function Reports({ tasks: propTasks, goals: propGoals, habits: propHabits
   return (
     <div>
       <Tabs tabs={tabs} active={activeTab} onChange={setActiveTab} />
-      <div style={S.grid4}>
+      <div style={S.grid4(isMobile)}>
         <div style={S.metric}>
           <div style={S.metricLabel}>Tasks Completed</div>
           <div style={S.metricVal}>{stats.weekTasksCompleted}</div>
@@ -122,7 +123,7 @@ export function Reports({ tasks: propTasks, goals: propGoals, habits: propHabits
         </div>
       </div>
 
-      <div style={{ ...S.grid2, marginBottom: 16 }}>
+      <div style={{ ...S.grid2(isMobile), marginBottom: 16 }}>
         <div style={S.card}>
           <div style={S.cardTitle}>Task completion by day</div>
           <MiniChart vals={REPORT_VALS} highlightIdx={3} height={80} />

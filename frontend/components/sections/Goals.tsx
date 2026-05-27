@@ -9,6 +9,7 @@ interface GoalsProps {
   error?: string | null;
   createGoal?: (data: Partial<Goal>) => Promise<Goal>;
   deleteGoal?: (id: string) => Promise<void>;
+  isMobile?: boolean;
 }
 
 export function Goals({
@@ -17,6 +18,7 @@ export function Goals({
   error: initialError,
   createGoal: createGoalProp,
   deleteGoal: deleteGoalProp,
+  isMobile,
 }: GoalsProps = {}) {
   const [goals, setGoals]     = useState<Goal[]>(initialGoals || []);
   const [loading, setLoading] = useState(initialLoading ?? true);
@@ -122,7 +124,7 @@ export function Goals({
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 14 }}>
         <button style={S.btn(true)} onClick={() => setShowModal(true)}>+ New Goal</button>
       </div>
-      <div style={S.grid2}>
+      <div style={S.grid2(isMobile)}>
         <div>
           {displayed.filter((_, i) => i % 2 === 0).map(g => (
             <GoalCard key={g._id} goal={g} onDelete={handleDelete}

@@ -115,7 +115,7 @@ export function Settings() {
   };
 
   return (
-    <div style={S.grid2}>
+    <div style={S.grid2(false)}>
       {/* ── LEFT COLUMN ───────────────────────────── */}
       <div>
         {/* Profile */}
