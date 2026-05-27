@@ -24,14 +24,18 @@ import { NAV } from "@/constants/styles";
 // ── Main app shell — แสดงเมื่อยืนยัน token แล้วเท่านั้น ────────────────
 function PersonalDevTracker() {
   const isMobile = useIsMobile()
+  const [mounted, setMounted] = useState(false)
   const [activeSection, setActiveSection] = useState("dashboard")
 
-  // Lift state ขึ้นมาที่นี่ เพื่อแชร์ข้อมูลกับ Dashboard โดยไม่ต้อง fetch ซ้ำ
   const taskProps  = useTasks();
   const habitProps = useHabits();
   const goalProps  = useGoals();
-  
 
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+  
+  if (!mounted) return null
   const renderSection = () => {
     switch (activeSection) {
       case "dashboard":
