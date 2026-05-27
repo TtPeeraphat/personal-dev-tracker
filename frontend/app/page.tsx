@@ -19,11 +19,7 @@ import { useGoals }  from "@/hooks/useGoals";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { NAV } from "@/constants/styles";
 
-useEffect(() => {
-  window.onerror = (msg, src, line, col, err) => {
-    document.body.innerHTML = `<pre style="padding:20px;color:red">${msg}\n${src}:${line}\n${err?.stack}</pre>`;
-  };
-}, []);
+
 
 // ── Main app shell — แสดงเมื่อยืนยัน token แล้วเท่านั้น ────────────────
 function PersonalDevTracker() {
