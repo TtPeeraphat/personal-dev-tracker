@@ -63,8 +63,9 @@ export interface User {
   email: string
   firstName: string
   lastName: string
-  timezone: string
-  preferences: {
+  role?: 'user' | 'admin'
+  timezone?: string
+  preferences?: {
     theme: string
     language: string
     weekStartsOn: string

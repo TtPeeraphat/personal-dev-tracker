@@ -5,6 +5,7 @@ import express from 'express'
 import cors from 'cors'
 import connectDB from './lib/db'
 import authRoutes  from './routes/auth'
+import adminRoutes from './routes/admin'
 import taskRoutes  from './routes/tasks'
 import goalRoutes  from './routes/goals'
 import habitRoutes from './routes/habits'
@@ -24,6 +25,7 @@ app.use(express.json())
 connectDB()
 
 app.use('/api/auth',   authRoutes)
+app.use('/api/admin',  adminRoutes)
 app.use('/api/tasks',  taskRoutes)
 app.use('/api/goals',  goalRoutes)
 app.use('/api/habits', habitRoutes)

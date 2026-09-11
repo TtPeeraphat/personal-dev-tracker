@@ -171,6 +171,12 @@ export default function LoginPage() {
           {loading ? "กำลังดำเนินการ..." : isRegister ? "สมัครสมาชิก" : "เข้าสู่ระบบ"}
         </button>
 
+        <div style={{ marginTop: 16, textAlign: "center" }}>
+          <a href="/admin/login" style={{ color: "#1D9E75", textDecoration: "none", fontSize: 12, fontWeight: 600 }}>
+            Open admin portal
+          </a>
+        </div>
+
       </div>
     </div>
   );

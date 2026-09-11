@@ -7,7 +7,10 @@ export interface IUser extends Document {
   password: string
   firstName: string
   lastName: string
+  role: 'user' | 'admin'
   timezone: string
+  createdAt?: Date
+  updatedAt?: Date
   preferences: {
     theme: string
     language: string
@@ -31,6 +34,11 @@ const userSchema = new Schema<IUser>({
   },
   firstName: { type: String, required: true },
   lastName:  { type: String, required: true },
+  role: {
+    type: String,
+    enum: ['user', 'admin'],
+    default: 'user'
+  },
   timezone:  { type: String, default: 'Asia/Bangkok' },
   preferences: {
     theme:        { type: String, default: 'light' },

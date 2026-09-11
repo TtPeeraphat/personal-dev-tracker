@@ -4,7 +4,10 @@ export type { Task, Goal, Habit, User };
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
-const getToken = () => localStorage.getItem("token");
+const getToken = (tokenKey = "token") => {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem(tokenKey);
+};
 
 // ── Error class ที่รองรับ field-level errors จาก zod ──────
 export class ApiError extends Error {
@@ -20,20 +23,26 @@ export class ApiError extends Error {
 }
 
 // ── Generic fetch wrapper ──────────────────────────────────
-const request = async <T>(path: string, options?: RequestInit): Promise<T> => {
+const request = async <T>(path: string, options?: RequestInit, tokenKey = "token"): Promise<T> => {
+  const token = getToken(tokenKey);
+
   const res = await fetch(`${BASE_URL}${path}`, {
     ...options,
     headers: {
       "Content-Type": "application/json",
-      ...(getToken() ? { Authorization: `Bearer ${getToken()}` } : {}),
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(options?.headers ?? {}),
     },
   });
 
-  if (res.status === 401 && !path.includes("/api/auth/login") && !path.includes("/api/auth/register")) {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    window.location.href = "/login";
+  if (res.status === 401 && !path.includes("/api/auth/login") && !path.includes("/api/auth/register") && !path.includes("/api/admin/login")) {
+    localStorage.removeItem(tokenKey);
+    localStorage.removeItem(tokenKey === "adminToken" ? "adminUser" : "user");
+    if (tokenKey === "token") {
+      window.location.href = "/login";
+    } else {
+      window.location.href = "/admin/login";
+    }
     throw new ApiError("กรุณาเข้าสู่ระบบใหม่", 401);
   }
 
@@ -47,7 +56,6 @@ const request = async <T>(path: string, options?: RequestInit): Promise<T> => {
   }
 
   if (!res.ok) {
-    // ส่ง field errors จาก zod ขึ้นมาด้วย
     throw new ApiError(
       body.message || `HTTP ${res.status}`,
       res.status,
@@ -76,6 +84,34 @@ export const loginApi = {
 
 export const authApi = {
   me: () => request<User>("/api/auth/me"),
+};
+
+export const adminApi = {
+  login: (data: { email: string; password: string }) =>
+    request<{ token: string; user: User }>("/api/admin/login", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }, "adminToken"),
+  me: () => request<User>("/api/admin/me", undefined, "adminToken"),
+  overview: () => request<{
+    summary: {
+      totalUsers: number;
+      totalTasks: number;
+      totalGoals: number;
+      totalHabits: number;
+      activeTasks: number;
+      completedGoals: number;
+      activeHabits: number;
+      adminAccounts: number;
+    };
+    recentUsers: Array<{
+      id: string;
+      name: string;
+      email: string;
+      role: string;
+      createdAt?: string;
+    }>;
+  }>("/api/admin/overview", undefined, "adminToken"),
 };
 
 // ── Tasks ──────────────────────────────────────────────────
