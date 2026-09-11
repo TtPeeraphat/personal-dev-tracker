@@ -1,10 +1,11 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { adminApi } from "@/lib/api";
 
-export default function AdminLoginPage() {
+// ── Inner form — uses useSearchParams, must be inside <Suspense> ──────────────
+function AdminLoginForm() {
   const router       = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail]       = useState("");
@@ -48,6 +49,171 @@ export default function AdminLoginPage() {
     }
   };
 
+  return (
+    <div
+      className={`admin-login-card${shake ? " shake" : ""}`}
+      style={{
+        width: "100%",
+        maxWidth: 420,
+        background: "rgba(15,23,42,0.75)",
+        border: "1px solid rgba(148,163,184,0.12)",
+        borderRadius: 20,
+        padding: "32px 28px",
+        boxShadow: "0 24px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.03) inset",
+        backdropFilter: "blur(20px)",
+      }}
+    >
+      {/* Logo pill */}
+      <div
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 8,
+          marginBottom: 24,
+          padding: "5px 12px",
+          borderRadius: 20,
+          background: "rgba(74,222,128,0.08)",
+          border: "1px solid rgba(74,222,128,0.15)",
+        }}
+      >
+        <span style={{ fontSize: 12, color: "#4ade80", fontWeight: 700, letterSpacing: 1 }}>
+          ⬡ DEVTRACK ADMIN
+        </span>
+      </div>
+
+      <h1 style={{ margin: "0 0 6px", fontSize: 30, fontWeight: 700, color: "#f8fafc", lineHeight: 1.2 }}>
+        Welcome back
+      </h1>
+      <p style={{ margin: "0 0 28px", color: "#64748b", fontSize: 14 }}>
+        Sign in to access the admin portal.
+      </p>
+
+      <form onSubmit={handleSubmit}>
+        {/* Email */}
+        <div style={{ marginBottom: 16 }}>
+          <label
+            htmlFor="admin-email"
+            style={{ display: "block", color: "#94a3b8", fontSize: 12, fontWeight: 500, marginBottom: 7 }}
+          >
+            Email address
+          </label>
+          <input
+            id="admin-email"
+            type="email"
+            className="admin-login-input"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="admin@example.com"
+            required
+            autoComplete="email"
+          />
+        </div>
+
+        {/* Password */}
+        <div style={{ marginBottom: 22 }}>
+          <label
+            htmlFor="admin-password"
+            style={{ display: "block", color: "#94a3b8", fontSize: 12, fontWeight: 500, marginBottom: 7 }}
+          >
+            Password
+          </label>
+          <input
+            id="admin-password"
+            type="password"
+            className="admin-login-input"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="••••••••"
+            required
+            autoComplete="current-password"
+          />
+        </div>
+
+        {/* Error banner */}
+        {error && (
+          <div
+            role="alert"
+            style={{
+              marginBottom: 18,
+              background: "rgba(220,38,38,0.1)",
+              color: "#fca5a5",
+              border: "1px solid rgba(220,38,38,0.2)",
+              borderRadius: 10,
+              padding: "10px 14px",
+              fontSize: 13,
+              display: "flex",
+              alignItems: "flex-start",
+              gap: 8,
+            }}
+          >
+            <span style={{ flexShrink: 0, marginTop: 1 }}>✕</span>
+            <span>{error}</span>
+          </div>
+        )}
+
+        <button
+          id="admin-login-submit"
+          type="submit"
+          className="admin-login-btn"
+          disabled={loading}
+        >
+          {loading ? (
+            <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+              <Spinner /> Verifying access…
+            </span>
+          ) : (
+            "Continue to dashboard →"
+          )}
+        </button>
+      </form>
+
+      <div style={{ marginTop: 24, textAlign: "center" }}>
+        <a href="/login" style={{ color: "#475569", textDecoration: "none", fontSize: 13 }}>
+          ← Return to user login
+        </a>
+      </div>
+    </div>
+  );
+}
+
+// ── Fallback shown during Suspense hydration ──────────────────────────────────
+function LoginSkeleton() {
+  return (
+    <div
+      style={{
+        width: "100%",
+        maxWidth: 420,
+        background: "rgba(15,23,42,0.75)",
+        border: "1px solid rgba(148,163,184,0.12)",
+        borderRadius: 20,
+        padding: "32px 28px",
+        backdropFilter: "blur(20px)",
+      }}
+    >
+      <style>{`
+        @keyframes shimmer {
+          0%   { background-position: -400px 0; }
+          100% { background-position:  400px 0; }
+        }
+        .sk-login {
+          background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.09) 50%, rgba(255,255,255,0.04) 75%);
+          background-size: 400px 100%;
+          animation: shimmer 1.4s infinite;
+          border-radius: 6px;
+        }
+      `}</style>
+      <div className="sk-login" style={{ height: 26, width: 140, marginBottom: 24, borderRadius: 20 }} />
+      <div className="sk-login" style={{ height: 36, width: 200, marginBottom: 10 }} />
+      <div className="sk-login" style={{ height: 18, width: 260, marginBottom: 28 }} />
+      <div className="sk-login" style={{ height: 42, marginBottom: 16, borderRadius: 10 }} />
+      <div className="sk-login" style={{ height: 42, marginBottom: 22, borderRadius: 10 }} />
+      <div className="sk-login" style={{ height: 46, borderRadius: 10 }} />
+    </div>
+  );
+}
+
+// ── Page export — Suspense wraps the useSearchParams consumer ─────────────────
+export default function AdminLoginPage() {
   return (
     <>
       <style>{`
@@ -98,8 +264,6 @@ export default function AdminLoginPage() {
           transition: opacity 0.2s, transform 0.15s;
           background: linear-gradient(135deg, #4ade80 0%, #22d3ee 100%);
           color: #0d1117;
-          position: relative;
-          overflow: hidden;
         }
         .admin-login-btn:disabled {
           opacity: 0.55;
@@ -123,138 +287,16 @@ export default function AdminLoginPage() {
           fontFamily: "'DM Sans', system-ui, sans-serif",
         }}
       >
-        <div
-          className={`admin-login-card${shake ? " shake" : ""}`}
-          style={{
-            width: "100%",
-            maxWidth: 420,
-            background: "rgba(15,23,42,0.75)",
-            border: "1px solid rgba(148,163,184,0.12)",
-            borderRadius: 20,
-            padding: "32px 28px",
-            boxShadow: "0 24px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.03) inset",
-            backdropFilter: "blur(20px)",
-          }}
-        >
-          {/* Logo */}
-          <div
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 8,
-              marginBottom: 24,
-              padding: "5px 12px",
-              borderRadius: 20,
-              background: "rgba(74,222,128,0.08)",
-              border: "1px solid rgba(74,222,128,0.15)",
-            }}
-          >
-            <span style={{ fontSize: 12, color: "#4ade80", fontWeight: 700, letterSpacing: 1 }}>
-              ⬡ DEVTRACK ADMIN
-            </span>
-          </div>
-
-          <h1 style={{ margin: "0 0 6px", fontSize: 30, fontWeight: 700, color: "#f8fafc", lineHeight: 1.2 }}>
-            Welcome back
-          </h1>
-          <p style={{ margin: "0 0 28px", color: "#64748b", fontSize: 14 }}>
-            Sign in to access the admin portal.
-          </p>
-
-          <form onSubmit={handleSubmit}>
-            {/* Email */}
-            <div style={{ marginBottom: 16 }}>
-              <label
-                htmlFor="admin-email"
-                style={{ display: "block", color: "#94a3b8", fontSize: 12, fontWeight: 500, marginBottom: 7 }}
-              >
-                Email address
-              </label>
-              <input
-                id="admin-email"
-                type="email"
-                className="admin-login-input"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@example.com"
-                required
-                autoComplete="email"
-              />
-            </div>
-
-            {/* Password */}
-            <div style={{ marginBottom: 22 }}>
-              <label
-                htmlFor="admin-password"
-                style={{ display: "block", color: "#94a3b8", fontSize: 12, fontWeight: 500, marginBottom: 7 }}
-              >
-                Password
-              </label>
-              <input
-                id="admin-password"
-                type="password"
-                className="admin-login-input"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-                autoComplete="current-password"
-              />
-            </div>
-
-            {/* Error banner */}
-            {error && (
-              <div
-                role="alert"
-                style={{
-                  marginBottom: 18,
-                  background: "rgba(220,38,38,0.1)",
-                  color: "#fca5a5",
-                  border: "1px solid rgba(220,38,38,0.2)",
-                  borderRadius: 10,
-                  padding: "10px 14px",
-                  fontSize: 13,
-                  display: "flex",
-                  alignItems: "flex-start",
-                  gap: 8,
-                }}
-              >
-                <span style={{ flexShrink: 0, marginTop: 1 }}>✕</span>
-                <span>{error}</span>
-              </div>
-            )}
-
-            <button
-              id="admin-login-submit"
-              type="submit"
-              className="admin-login-btn"
-              disabled={loading}
-            >
-              {loading ? (
-                <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
-                  <Spinner /> Verifying access…
-                </span>
-              ) : (
-                "Continue to dashboard →"
-              )}
-            </button>
-          </form>
-
-          <div style={{ marginTop: 24, textAlign: "center" }}>
-            <a
-              href="/login"
-              style={{ color: "#475569", textDecoration: "none", fontSize: 13 }}
-            >
-              ← Return to user login
-            </a>
-          </div>
-        </div>
+        {/* Suspense boundary required by Next.js for useSearchParams() */}
+        <Suspense fallback={<LoginSkeleton />}>
+          <AdminLoginForm />
+        </Suspense>
       </div>
     </>
   );
 }
 
-// ── Inline spinner ─────────────────────────────────────────────────────────
+// ── Inline spinner ─────────────────────────────────────────────────────────────
 function Spinner() {
   return (
     <>
