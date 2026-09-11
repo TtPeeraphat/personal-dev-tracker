@@ -43,13 +43,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+    <div style={{ display: "flex", minHeight: "100vh", fontFamily: "'DM Sans', system-ui, sans-serif", background: "#FAFAF8" }}>
       {/* ── Mobile backdrop ───────────────────────────────────────────────── */}
       {sidebarOpen && (
         <div
           onClick={() => setSidebarOpen(false)}
           style={{
-            position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)",
+            position: "fixed", inset: 0, background: "rgba(0,0,0,0.3)",
             zIndex: 40, display: "block",
           }}
         />
@@ -58,9 +58,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* ── Sidebar ───────────────────────────────────────────────────────── */}
       <aside
         style={{
-          width: 230,
-          background: "#0d1117",
-          borderRight: "1px solid rgba(255,255,255,0.07)",
+          width: 220,
+          background: "#ffffff",
+          borderRight: "0.5px solid rgba(0,0,0,0.08)",
           display: "flex",
           flexDirection: "column",
           position: "fixed",
@@ -76,24 +76,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         {/* Logo */}
         <div
           style={{
-            padding: "22px 20px 18px",
-            borderBottom: "1px solid rgba(255,255,255,0.06)",
+            padding: "20px 18px 16px",
+            borderBottom: "0.5px solid rgba(0,0,0,0.08)",
           }}
         >
-          <div
-            style={{
-              fontSize: 10,
-              letterSpacing: 3,
-              textTransform: "uppercase",
-              color: "#4ade80",
-              marginBottom: 6,
-              fontWeight: 600,
-            }}
-          >
-            DevTrack
+          <div style={{ fontFamily: "Georgia, serif", fontSize: 17, fontStyle: "italic", color: "#1a1a18", letterSpacing: "-0.02em" }}>
+            dev<span style={{ color: "#1D9E75" }}>·</span>track
           </div>
-          <div style={{ fontSize: 18, fontWeight: 700, color: "#f8fafc", lineHeight: 1.2 }}>
-            Admin Portal
+          <div style={{ fontFamily: "monospace", fontSize: 11, color: "#888780", marginTop: 2, display: "flex", alignItems: "center", gap: 6 }}>
+            <span>personal growth os</span>
+            <span style={{ color: "#0F6E56", background: "#E1F5EE", padding: "1px 6px", borderRadius: 10, fontSize: 9, fontWeight: 600 }}>admin</span>
           </div>
         </div>
 
@@ -103,8 +95,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             style={{
               fontSize: 10,
               fontWeight: 600,
-              color: "#4b5563",
-              letterSpacing: "0.1em",
+              color: "#888780",
+              letterSpacing: "0.08em",
               textTransform: "uppercase",
               padding: "0 8px",
               marginBottom: 8,
@@ -124,17 +116,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  gap: 10,
-                  padding: "9px 12px",
-                  borderRadius: 8,
-                  margin: "2px 0",
+                  gap: 9,
+                  padding: "8px 10px",
+                  borderRadius: 7,
+                  margin: "1px 0",
                   textDecoration: "none",
                   fontSize: 13,
-                  fontWeight: active ? 600 : 400,
-                  color: active ? "#4ade80" : "#94a3b8",
-                  background: active
-                    ? "rgba(74, 222, 128, 0.08)"
-                    : "transparent",
+                  fontWeight: active ? 500 : 400,
+                  color: active ? "#0F6E56" : "#5F5E5A",
+                  background: active ? "#E1F5EE" : "transparent",
                   transition: "all 0.15s",
                 }}
               >
@@ -149,7 +139,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                       width: 6,
                       height: 6,
                       borderRadius: "50%",
-                      background: "#4ade80",
+                      background: "#1D9E75",
                       flexShrink: 0,
                     }}
                   />
@@ -162,8 +152,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         {/* Sidebar footer */}
         <div
           style={{
-            padding: "14px 18px",
-            borderTop: "1px solid rgba(255,255,255,0.06)",
+            padding: "14px 14px",
+            borderTop: "0.5px solid rgba(0,0,0,0.08)",
           }}
         >
           <div
@@ -176,16 +166,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           >
             <div
               style={{
-                width: 32,
-                height: 32,
+                width: 30,
+                height: 30,
                 borderRadius: "50%",
-                background: "linear-gradient(135deg, #4ade80, #22d3ee)",
+                background: "#E1F5EE",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                fontSize: 13,
-                fontWeight: 700,
-                color: "#0d1117",
+                fontSize: 11,
+                fontWeight: 600,
+                color: "#0F6E56",
                 flexShrink: 0,
               }}
             >
@@ -195,8 +185,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <div
                 style={{
                   fontSize: 13,
-                  fontWeight: 600,
-                  color: "#f8fafc",
+                  fontWeight: 500,
+                  color: "#1a1a18",
                   whiteSpace: "nowrap",
                   overflow: "hidden",
                   textOverflow: "ellipsis",
@@ -204,23 +194,24 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               >
                 {adminName}
               </div>
-              <div style={{ fontSize: 11, color: "#4b5563" }}>Administrator</div>
+              <div style={{ fontSize: 11, color: "#888780" }}>Administrator</div>
             </div>
           </div>
           <button
             onClick={handleLogout}
             style={{
               width: "100%",
-              padding: "8px 12px",
-              borderRadius: 8,
-              border: "1px solid rgba(255,255,255,0.08)",
-              background: "transparent",
-              color: "#94a3b8",
+              padding: "7px 12px",
+              borderRadius: 7,
+              border: "0.5px solid rgba(0,0,0,0.12)",
+              background: "#ffffff",
+              color: "#5F5E5A",
               fontSize: 12,
               cursor: "pointer",
               display: "flex",
               alignItems: "center",
-              gap: 8,
+              justifyContent: "center",
+              gap: 6,
               transition: "all 0.15s",
               fontFamily: "inherit",
             }}
@@ -231,13 +222,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </aside>
 
       {/* ── Main content area ─────────────────────────────────────────────── */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", marginLeft: 230 }}>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", marginLeft: 220 }}>
         {/* Header */}
         <header
           style={{
-            height: 60,
-            background: "#0d1117",
-            borderBottom: "1px solid rgba(255,255,255,0.07)",
+            height: 56,
+            background: "#ffffff",
+            borderBottom: "0.5px solid rgba(0,0,0,0.08)",
             display: "flex",
             alignItems: "center",
             padding: "0 24px",
@@ -255,7 +246,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               display: "none",
               border: "none",
               background: "transparent",
-              color: "#94a3b8",
+              color: "#5F5E5A",
               cursor: "pointer",
               fontSize: 20,
               padding: 4,
@@ -266,15 +257,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
           {/* Page title */}
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 11, color: "#4b5563", marginBottom: 2 }}>
-              Admin Portal
-            </div>
             <h1
               style={{
                 margin: 0,
-                fontSize: 16,
-                fontWeight: 600,
-                color: "#f8fafc",
+                fontFamily: "Georgia, serif",
+                fontSize: 19,
+                fontWeight: 400,
+                fontStyle: "italic",
+                color: "#1a1a18",
+                letterSpacing: "-0.02em",
               }}
             >
               {currentPage}
@@ -287,14 +278,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               href="/"
               style={{
                 textDecoration: "none",
-                color: "#94a3b8",
+                color: "#5F5E5A",
                 fontSize: 12,
                 padding: "6px 12px",
                 borderRadius: 7,
-                border: "1px solid rgba(255,255,255,0.08)",
+                border: "0.5px solid rgba(0,0,0,0.08)",
+                background: "#ffffff",
                 display: "flex",
                 alignItems: "center",
-                gap: 6,
+                gap: 5,
                 transition: "all 0.15s",
               }}
             >
@@ -307,7 +299,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <main
           style={{
             flex: 1,
-            background: "linear-gradient(180deg, #0f172a 0%, #111827 100%)",
+            background: "#FAFAF8",
             minHeight: 0,
             overflowY: "auto",
           }}

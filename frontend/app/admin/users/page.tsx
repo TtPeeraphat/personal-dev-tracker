@@ -78,26 +78,26 @@ export default function AdminUsersPage() {
   const totalPages = data?.totalPages ?? 1;
 
   return (
-    <div style={{ padding: "28px 28px 60px", maxWidth: 1200 }}>
+    <div style={{ padding: "24px 24px 60px", maxWidth: 1200 }}>
       {/* Page header */}
-      <div style={{ marginBottom: 24 }}>
+      <div style={{ marginBottom: 20 }}>
         <div
           style={{
-            fontSize: 11, color: "#4ade80", fontWeight: 600,
-            letterSpacing: 2, textTransform: "uppercase", marginBottom: 6,
+            fontSize: 10, color: "#888780", fontWeight: 600,
+            letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 4,
           }}
         >
           Management
         </div>
         <h2
           style={{
-            margin: 0, fontSize: 28, fontWeight: 700,
-            color: "#f8fafc", letterSpacing: "-0.02em",
+            margin: 0, fontSize: 22, fontWeight: 600,
+            color: "#1a1a18", letterSpacing: "-0.01em",
           }}
         >
           User Management
         </h2>
-        <p style={{ margin: "6px 0 0", color: "#475569", fontSize: 14 }}>
+        <p style={{ margin: "4px 0 0", color: "#888780", fontSize: 13 }}>
           {data ? `${data.total.toLocaleString()} registered users` : "Loading…"}
         </p>
       </div>
@@ -105,7 +105,7 @@ export default function AdminUsersPage() {
       {/* Toolbar */}
       <div
         style={{
-          display: "flex", gap: 12, marginBottom: 20,
+          display: "flex", gap: 12, marginBottom: 18,
           flexWrap: "wrap", alignItems: "center",
         }}
       >
@@ -113,7 +113,7 @@ export default function AdminUsersPage() {
           <span
             style={{
               position: "absolute", left: 12, top: "50%",
-              transform: "translateY(-50%)", color: "#4b5563", fontSize: 15,
+              transform: "translateY(-50%)", color: "#888780", fontSize: 15,
               pointerEvents: "none",
             }}
           >
@@ -128,18 +128,24 @@ export default function AdminUsersPage() {
             style={{
               width: "100%",
               boxSizing: "border-box",
-              padding: "10px 12px 10px 36px",
-              borderRadius: 10,
-              border: "1px solid rgba(255,255,255,0.08)",
-              background: "rgba(255,255,255,0.04)",
-              color: "#f8fafc",
+              padding: "8px 12px 8px 36px",
+              borderRadius: 8,
+              border: "0.5px solid rgba(0,0,0,0.12)",
+              background: "#ffffff",
+              color: "#1a1a18",
               fontSize: 13,
               fontFamily: "inherit",
               outline: "none",
-              transition: "border-color 0.2s",
+              transition: "border-color 0.2s, box-shadow 0.2s",
             }}
-            onFocus={(e) => (e.target.style.borderColor = "#4ade80")}
-            onBlur={(e) => (e.target.style.borderColor = "rgba(255,255,255,0.08)")}
+            onFocus={(e) => {
+              e.target.style.borderColor = "#1D9E75";
+              e.target.style.boxShadow = "0 0 0 3px rgba(29, 158, 117, 0.12)";
+            }}
+            onBlur={(e) => {
+              e.target.style.borderColor = "rgba(0,0,0,0.12)";
+              e.target.style.boxShadow = "none";
+            }}
           />
         </div>
 
@@ -147,11 +153,11 @@ export default function AdminUsersPage() {
         <button
           onClick={fetchUsers}
           style={{
-            padding: "10px 16px", borderRadius: 10,
-            border: "1px solid rgba(255,255,255,0.08)",
-            background: "rgba(255,255,255,0.04)",
-            color: "#94a3b8", fontSize: 13, cursor: "pointer",
-            fontFamily: "inherit", transition: "border-color 0.2s",
+            padding: "8px 14px", borderRadius: 8,
+            border: "0.5px solid rgba(0,0,0,0.12)",
+            background: "#ffffff",
+            color: "#5F5E5A", fontSize: 12, cursor: "pointer",
+            fontFamily: "inherit", transition: "all 0.15s",
             display: "flex", alignItems: "center", gap: 6,
           }}
         >
@@ -162,9 +168,9 @@ export default function AdminUsersPage() {
       {/* Table */}
       <div
         style={{
-          background: "rgba(255,255,255,0.03)",
-          border: "1px solid rgba(255,255,255,0.07)",
-          borderRadius: 16,
+          background: "#ffffff",
+          border: "0.5px solid rgba(0,0,0,0.08)",
+          borderRadius: 12,
           overflow: "hidden",
         }}
       >
@@ -173,13 +179,14 @@ export default function AdminUsersPage() {
           style={{
             display: "grid",
             gridTemplateColumns: "1fr 1.4fr 100px 140px",
-            padding: "12px 20px",
-            borderBottom: "1px solid rgba(255,255,255,0.06)",
-            fontSize: 11,
+            padding: "10px 18px",
+            borderBottom: "0.5px solid rgba(0,0,0,0.08)",
+            fontSize: 10,
             fontWeight: 600,
-            color: "#4b5563",
+            color: "#888780",
             textTransform: "uppercase",
             letterSpacing: "0.08em",
+            background: "#FAFAF8",
           }}
         >
           <span>Name</span>
@@ -194,10 +201,10 @@ export default function AdminUsersPage() {
         ) : !data || data.users.length === 0 ? (
           <div
             style={{
-              padding: "60px 20px",
+              padding: "50px 20px",
               textAlign: "center",
-              color: "#4b5563",
-              fontSize: 14,
+              color: "#888780",
+              fontSize: 13,
             }}
           >
             {debouncedSearch
@@ -237,14 +244,13 @@ function UserRow({ user, isLast }: { user: UserRow; isLast: boolean }) {
       style={{
         display: "grid",
         gridTemplateColumns: "1fr 1.4fr 100px 140px",
-        padding: "14px 20px",
-        borderBottom: isLast ? "none" : "1px solid rgba(255,255,255,0.04)",
+        padding: "12px 18px",
+        borderBottom: isLast ? "none" : "0.5px solid rgba(0,0,0,0.06)",
         alignItems: "center",
         transition: "background 0.15s",
       }}
       onMouseEnter={(e) =>
-        ((e.currentTarget as HTMLDivElement).style.background =
-          "rgba(255,255,255,0.025)")
+        ((e.currentTarget as HTMLDivElement).style.background = "#F4F4F0")
       }
       onMouseLeave={(e) =>
         ((e.currentTarget as HTMLDivElement).style.background = "transparent")
@@ -254,24 +260,22 @@ function UserRow({ user, isLast }: { user: UserRow; isLast: boolean }) {
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
         <div
           style={{
-            width: 32, height: 32, borderRadius: "50%", flexShrink: 0,
-            background: isAdmin
-              ? "linear-gradient(135deg, #4ade80, #22d3ee)"
-              : "rgba(255,255,255,0.08)",
+            width: 30, height: 30, borderRadius: "50%", flexShrink: 0,
+            background: isAdmin ? "#E1F5EE" : "#F4F4F0",
             display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: 13, fontWeight: 700,
-            color: isAdmin ? "#0d1117" : "#94a3b8",
+            fontSize: 11, fontWeight: 600,
+            color: isAdmin ? "#0F6E56" : "#5F5E5A",
           }}
         >
           {user.name.charAt(0).toUpperCase()}
         </div>
-        <span style={{ fontSize: 13, fontWeight: 500, color: "#e2e8f0" }}>
+        <span style={{ fontSize: 13, fontWeight: 500, color: "#1a1a18" }}>
           {user.name}
         </span>
       </div>
 
       {/* Email */}
-      <span style={{ fontSize: 13, color: "#64748b", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+      <span style={{ fontSize: 13, color: "#5F5E5A", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
         {user.email}
       </span>
 
@@ -281,22 +285,23 @@ function UserRow({ user, isLast }: { user: UserRow; isLast: boolean }) {
           display: "inline-flex",
           alignItems: "center",
           gap: 5,
-          padding: "4px 10px",
+          padding: "2px 8px",
           borderRadius: 20,
-          fontSize: 11,
+          fontSize: 10,
+          fontFamily: "monospace",
           fontWeight: 600,
-          background: isAdmin ? "rgba(74,222,128,0.12)" : "rgba(148,163,184,0.08)",
-          color:      isAdmin ? "#4ade80"              : "#64748b",
-          border:     isAdmin ? "1px solid rgba(74,222,128,0.2)" : "1px solid rgba(148,163,184,0.1)",
+          background: isAdmin ? "#E1F5EE" : "#F4F4F0",
+          color:      isAdmin ? "#0F6E56" : "#5F5E5A",
+          border:     isAdmin ? "0.5px solid #9FE1CB" : "0.5px solid rgba(0,0,0,0.08)",
           width: "fit-content",
         }}
       >
-        {isAdmin && <span style={{ fontSize: 8, lineHeight: 1 }}>●</span>}
+        {isAdmin && <span style={{ fontSize: 7, lineHeight: 1 }}>●</span>}
         {user.role}
       </span>
 
       {/* Joined */}
-      <span style={{ fontSize: 12, color: "#4b5563" }}>
+      <span style={{ fontSize: 12, color: "#888780" }}>
         {formatDate(user.createdAt)}
       </span>
     </div>
@@ -313,7 +318,7 @@ function SkeletonRows() {
           100% { background-position:  600px 0; }
         }
         .sk-row {
-          background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.07) 50%, rgba(255,255,255,0.04) 75%);
+          background: linear-gradient(90deg, rgba(0,0,0,0.04) 25%, rgba(0,0,0,0.07) 50%, rgba(0,0,0,0.04) 75%);
           background-size: 600px 100%;
           animation: shimmer 1.5s infinite;
           border-radius: 6px;
@@ -325,19 +330,19 @@ function SkeletonRows() {
           style={{
             display: "grid",
             gridTemplateColumns: "1fr 1.4fr 100px 140px",
-            padding: "14px 20px",
-            borderBottom: i < 7 ? "1px solid rgba(255,255,255,0.04)" : "none",
+            padding: "12px 18px",
+            borderBottom: i < 7 ? "0.5px solid rgba(0,0,0,0.06)" : "none",
             gap: 0,
             alignItems: "center",
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div className="sk-row" style={{ width: 32, height: 32, borderRadius: "50%", flexShrink: 0 }} />
-            <div className="sk-row" style={{ height: 13, width: 120 }} />
+            <div className="sk-row" style={{ width: 30, height: 30, borderRadius: "50%", flexShrink: 0 }} />
+            <div className="sk-row" style={{ height: 13, width: 110 }} />
           </div>
-          <div className="sk-row" style={{ height: 13, width: "80%" }} />
-          <div className="sk-row" style={{ height: 22, width: 55, borderRadius: 20 }} />
-          <div className="sk-row" style={{ height: 12, width: 90 }} />
+          <div className="sk-row" style={{ height: 13, width: "75%" }} />
+          <div className="sk-row" style={{ height: 20, width: 50, borderRadius: 20 }} />
+          <div className="sk-row" style={{ height: 12, width: 80 }} />
         </div>
       ))}
     </>
@@ -368,11 +373,11 @@ function Pagination({
         marginTop: 16, flexWrap: "wrap", gap: 12,
       }}
     >
-      <span style={{ fontSize: 13, color: "#4b5563" }}>
+      <span style={{ fontSize: 12, color: "#888780" }}>
         Showing {from}–{to} of {total.toLocaleString()} users
       </span>
 
-      <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+      <div style={{ display: "flex", gap: 5, alignItems: "center" }}>
         <PageBtn
           id="users-prev"
           label="← Prev"
@@ -395,11 +400,11 @@ function Pagination({
               key={p}
               onClick={() => onPage(p)}
               style={{
-                width: 34, height: 34, borderRadius: 8, border: "1px solid",
-                borderColor: p === page ? "#4ade80" : "rgba(255,255,255,0.08)",
-                background: p === page ? "rgba(74,222,128,0.12)" : "transparent",
-                color: p === page ? "#4ade80" : "#64748b",
-                fontSize: 13, fontWeight: p === page ? 600 : 400,
+                width: 32, height: 32, borderRadius: 6, border: "0.5px solid",
+                borderColor: p === page ? "#9FE1CB" : "rgba(0,0,0,0.1)",
+                background: p === page ? "#E1F5EE" : "#ffffff",
+                color: p === page ? "#0F6E56" : "#5F5E5A",
+                fontSize: 12, fontWeight: p === page ? 600 : 400,
                 cursor: "pointer", fontFamily: "inherit",
               }}
             >
@@ -436,11 +441,11 @@ function PageBtn({
       onClick={onClick}
       disabled={disabled}
       style={{
-        padding: "7px 14px", borderRadius: 8,
-        border: "1px solid rgba(255,255,255,0.08)",
-        background: "transparent",
-        color: disabled ? "#2d3748" : "#94a3b8",
-        fontSize: 13, cursor: disabled ? "not-allowed" : "pointer",
+        padding: "6px 12px", borderRadius: 6,
+        border: "0.5px solid rgba(0,0,0,0.1)",
+        background: "#ffffff",
+        color: disabled ? "#D3D1C7" : "#5F5E5A",
+        fontSize: 12, cursor: disabled ? "not-allowed" : "pointer",
         fontFamily: "inherit", transition: "border-color 0.15s",
       }}
     >

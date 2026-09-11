@@ -23,32 +23,32 @@ const STAT_CARDS = (s: Summary) => [
     label: "Total Users",
     value: s.totalUsers,
     icon: "👤",
-    accent: "#4ade80",
-    bg: "rgba(74,222,128,0.08)",
+    accent: "#185FA5",
+    bg: "#E6F1FB",
     href: "/admin/users",
   },
   {
     label: "Active Tasks",
     value: s.activeTasks,
     icon: "✓",
-    accent: "#60a5fa",
-    bg: "rgba(96,165,250,0.08)",
+    accent: "#1D9E75",
+    bg: "#E1F5EE",
     href: null,
   },
   {
     label: "Completed Goals",
     value: s.completedGoals,
     icon: "◎",
-    accent: "#fbbf24",
-    bg: "rgba(251,191,36,0.08)",
+    accent: "#854F0B",
+    bg: "#FAEEDA",
     href: null,
   },
   {
     label: "Active Habits",
     value: s.activeHabits,
     icon: "⚡",
-    accent: "#e879f9",
-    bg: "rgba(232,121,249,0.08)",
+    accent: "#3C3489",
+    bg: "#EEEDFE",
     href: null,
   },
 ];
@@ -77,17 +77,17 @@ export default function AdminDashboardPage() {
   if (loading) return <DashboardSkeleton />;
 
   return (
-    <div style={{ padding: "28px 28px 60px", maxWidth: 1200 }}>
+    <div style={{ padding: "24px 24px 60px", maxWidth: 1200 }}>
       {/* Page header */}
-      <div style={{ marginBottom: 28 }}>
+      <div style={{ marginBottom: 24 }}>
         <div
           style={{
-            fontSize: 11,
-            color: "#4ade80",
+            fontSize: 10,
+            color: "#888780",
             fontWeight: 600,
-            letterSpacing: 2,
+            letterSpacing: "0.08em",
             textTransform: "uppercase",
-            marginBottom: 6,
+            marginBottom: 4,
           }}
         >
           Overview
@@ -95,15 +95,15 @@ export default function AdminDashboardPage() {
         <h2
           style={{
             margin: 0,
-            fontSize: 28,
-            fontWeight: 700,
-            color: "#f8fafc",
-            letterSpacing: "-0.02em",
+            fontSize: 22,
+            fontWeight: 600,
+            color: "#1a1a18",
+            letterSpacing: "-0.01em",
           }}
         >
           Operations Dashboard
         </h2>
-        <p style={{ margin: "6px 0 0", color: "#475569", fontSize: 14 }}>
+        <p style={{ margin: "4px 0 0", color: "#888780", fontSize: 13 }}>
           Real-time system metrics and activity summary.
         </p>
       </div>
@@ -113,31 +113,32 @@ export default function AdminDashboardPage() {
         style={{
           display: "grid",
           gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-          gap: 16,
-          marginBottom: 28,
+          gap: 14,
+          marginBottom: 24,
         }}
       >
         {statCards.map((card) => {
           const inner = (
             <div
               style={{
-                background: "rgba(255,255,255,0.03)",
-                border: "1px solid rgba(255,255,255,0.07)",
-                borderRadius: 16,
-                padding: "20px 22px",
-                backdropFilter: "blur(8px)",
-                transition: "border-color 0.2s, transform 0.2s",
+                background: "#ffffff",
+                border: "0.5px solid rgba(0,0,0,0.08)",
+                borderRadius: 12,
+                padding: "18px 20px",
+                transition: "border-color 0.2s, transform 0.15s, box-shadow 0.15s",
                 cursor: card.href ? "pointer" : "default",
               }}
               onMouseEnter={(e) => {
                 if (card.href) {
-                  (e.currentTarget as HTMLDivElement).style.borderColor = card.accent + "55";
-                  (e.currentTarget as HTMLDivElement).style.transform = "translateY(-2px)";
+                  (e.currentTarget as HTMLDivElement).style.borderColor = card.accent;
+                  (e.currentTarget as HTMLDivElement).style.transform = "translateY(-1px)";
+                  (e.currentTarget as HTMLDivElement).style.boxShadow = "0 4px 12px rgba(0,0,0,0.04)";
                 }
               }}
               onMouseLeave={(e) => {
-                (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(255,255,255,0.07)";
+                (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(0,0,0,0.08)";
                 (e.currentTarget as HTMLDivElement).style.transform = "translateY(0)";
+                (e.currentTarget as HTMLDivElement).style.boxShadow = "none";
               }}
             >
               <div
@@ -145,35 +146,36 @@ export default function AdminDashboardPage() {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "space-between",
-                  marginBottom: 14,
+                  marginBottom: 12,
                 }}
               >
-                <span style={{ fontSize: 12, color: "#64748b", fontWeight: 500 }}>
+                <span style={{ fontSize: 12, color: "#888780", fontWeight: 500 }}>
                   {card.label}
                 </span>
                 <div
                   style={{
-                    width: 32,
-                    height: 32,
+                    width: 30,
+                    height: 30,
                     borderRadius: 8,
                     background: card.bg,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    fontSize: 15,
+                    fontSize: 14,
+                    color: card.accent,
                   }}
                 >
                   {card.icon}
                 </div>
               </div>
               <div
-                style={{ fontSize: 36, fontWeight: 800, color: card.accent, lineHeight: 1 }}
+                style={{ fontFamily: "monospace", fontSize: 28, fontWeight: 700, color: card.accent, lineHeight: 1 }}
               >
                 {card.value.toLocaleString()}
               </div>
               {card.href && (
                 <div
-                  style={{ fontSize: 11, color: "#4ade80", marginTop: 10, opacity: 0.8 }}
+                  style={{ fontSize: 11, color: "#1D9E75", marginTop: 8, fontWeight: 500 }}
                 >
                   View all →
                 </div>
@@ -194,10 +196,10 @@ export default function AdminDashboardPage() {
       {/* System snapshot */}
       <div
         style={{
-          background: "rgba(255,255,255,0.03)",
-          border: "1px solid rgba(255,255,255,0.07)",
-          borderRadius: 16,
-          padding: "22px 24px",
+          background: "#ffffff",
+          border: "0.5px solid rgba(0,0,0,0.08)",
+          borderRadius: 12,
+          padding: "20px 22px",
         }}
       >
         <div
@@ -205,13 +207,13 @@ export default function AdminDashboardPage() {
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            marginBottom: 20,
+            marginBottom: 16,
           }}
         >
-          <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600, color: "#f8fafc" }}>
+          <h3 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: "#1a1a18" }}>
             System Snapshot
           </h3>
-          <span style={{ fontSize: 12, color: "#4b5563" }}>All-time totals</span>
+          <span style={{ fontSize: 11, color: "#888780" }}>All-time totals</span>
         </div>
 
         <div
@@ -230,21 +232,20 @@ export default function AdminDashboardPage() {
             <div
               key={item.label}
               style={{
-                background: "rgba(255,255,255,0.03)",
-                border: "1px solid rgba(255,255,255,0.05)",
-                borderRadius: 12,
-                padding: "14px 16px",
+                background: "#F4F4F0",
+                borderRadius: 9,
+                padding: "12px 14px",
               }}
             >
-              <div style={{ fontSize: 11, color: "#4b5563", marginBottom: 6 }}>
+              <div style={{ fontSize: 11, color: "#888780", marginBottom: 4 }}>
                 {item.label}
               </div>
               <div
                 style={{
                   fontFamily: "monospace",
-                  fontSize: 26,
-                  fontWeight: 700,
-                  color: "#f8fafc",
+                  fontSize: 22,
+                  fontWeight: 600,
+                  color: "#1a1a18",
                 }}
               >
                 {item.value.toLocaleString()}
@@ -260,45 +261,45 @@ export default function AdminDashboardPage() {
 // ── Skeleton loader ───────────────────────────────────────────────────────────
 function DashboardSkeleton() {
   return (
-    <div style={{ padding: "28px 28px 60px", maxWidth: 1200 }}>
+    <div style={{ padding: "24px 24px 60px", maxWidth: 1200 }}>
       <style>{`
         @keyframes shimmer {
           0%   { background-position: -600px 0; }
           100% { background-position:  600px 0; }
         }
         .sk {
-          background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%);
+          background: linear-gradient(90deg, rgba(0,0,0,0.04) 25%, rgba(0,0,0,0.08) 50%, rgba(0,0,0,0.04) 75%);
           background-size: 600px 100%;
           animation: shimmer 1.5s infinite;
-          border-radius: 8px;
+          border-radius: 6px;
         }
       `}</style>
 
       {/* Title skeleton */}
-      <div className="sk" style={{ height: 14, width: 90, marginBottom: 10 }} />
-      <div className="sk" style={{ height: 32, width: 260, marginBottom: 28 }} />
+      <div className="sk" style={{ height: 12, width: 80, marginBottom: 8 }} />
+      <div className="sk" style={{ height: 26, width: 220, marginBottom: 24 }} />
 
       {/* Cards skeleton */}
       <div
         style={{
           display: "grid",
           gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-          gap: 16,
-          marginBottom: 28,
+          gap: 14,
+          marginBottom: 24,
         }}
       >
         {Array.from({ length: 4 }).map((_, i) => (
           <div
             key={i}
             style={{
-              background: "rgba(255,255,255,0.03)",
-              border: "1px solid rgba(255,255,255,0.07)",
-              borderRadius: 16,
-              padding: "20px 22px",
+              background: "#ffffff",
+              border: "0.5px solid rgba(0,0,0,0.08)",
+              borderRadius: 12,
+              padding: "18px 20px",
             }}
           >
-            <div className="sk" style={{ height: 12, width: 80, marginBottom: 16 }} />
-            <div className="sk" style={{ height: 40, width: 70 }} />
+            <div className="sk" style={{ height: 12, width: 80, marginBottom: 14 }} />
+            <div className="sk" style={{ height: 32, width: 60 }} />
           </div>
         ))}
       </div>
@@ -306,13 +307,13 @@ function DashboardSkeleton() {
       {/* Snapshot skeleton */}
       <div
         style={{
-          background: "rgba(255,255,255,0.03)",
-          border: "1px solid rgba(255,255,255,0.07)",
-          borderRadius: 16,
-          padding: "22px 24px",
+          background: "#ffffff",
+          border: "0.5px solid rgba(0,0,0,0.08)",
+          borderRadius: 12,
+          padding: "20px 22px",
         }}
       >
-        <div className="sk" style={{ height: 18, width: 140, marginBottom: 20 }} />
+        <div className="sk" style={{ height: 16, width: 130, marginBottom: 16 }} />
         <div
           style={{
             display: "grid",
@@ -324,13 +325,13 @@ function DashboardSkeleton() {
             <div
               key={i}
               style={{
-                background: "rgba(255,255,255,0.03)",
-                borderRadius: 12,
-                padding: "14px 16px",
+                background: "#F4F4F0",
+                borderRadius: 9,
+                padding: "12px 14px",
               }}
             >
-              <div className="sk" style={{ height: 11, width: 80, marginBottom: 8 }} />
-              <div className="sk" style={{ height: 28, width: 50 }} />
+              <div className="sk" style={{ height: 11, width: 70, marginBottom: 6 }} />
+              <div className="sk" style={{ height: 24, width: 40 }} />
             </div>
           ))}
         </div>
