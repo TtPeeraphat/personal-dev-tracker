@@ -5,10 +5,11 @@
   "main": "index.js",
 
   "scripts": {
-    "dev":   "nodemon --exec ts-node src/index.ts",
-    "build": "tsc",
-    "start": "node dist/index.js",
-    "lint": "tsc --noEmit"
+    "dev":        "nodemon --exec ts-node src/index.ts",
+    "build":      "tsc",
+    "start":      "node dist/index.js",
+    "lint":       "tsc --noEmit",
+    "seed:admin": "ts-node src/scripts/seedAdmin.ts"
   },
   "keywords": [],
   "author": "",

@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { adminApi } from "@/lib/api";
+import { useToast } from "@/hooks/useToast";
 
+// ── Types ────────────────────────────────────────────────────────────────────
 type Summary = {
   totalUsers: number;
   totalTasks: number;
@@ -15,175 +17,322 @@ type Summary = {
   adminAccounts: number;
 };
 
-type UserRow = {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  createdAt?: string;
-};
+// ── Stat card config ──────────────────────────────────────────────────────────
+const STAT_CARDS = (s: Summary) => [
+  {
+    label: "Total Users",
+    value: s.totalUsers,
+    icon: "👤",
+    accent: "#4ade80",
+    bg: "rgba(74,222,128,0.08)",
+    href: "/admin/users",
+  },
+  {
+    label: "Active Tasks",
+    value: s.activeTasks,
+    icon: "✓",
+    accent: "#60a5fa",
+    bg: "rgba(96,165,250,0.08)",
+    href: null,
+  },
+  {
+    label: "Completed Goals",
+    value: s.completedGoals,
+    icon: "◎",
+    accent: "#fbbf24",
+    bg: "rgba(251,191,36,0.08)",
+    href: null,
+  },
+  {
+    label: "Active Habits",
+    value: s.activeHabits,
+    icon: "⚡",
+    accent: "#e879f9",
+    bg: "rgba(232,121,249,0.08)",
+    href: null,
+  },
+];
 
+// ── Dashboard ─────────────────────────────────────────────────────────────────
 export default function AdminDashboardPage() {
-  const router = useRouter();
+  const toast = useToast();
   const [summary, setSummary] = useState<Summary | null>(null);
-  const [recentUsers, setRecentUsers] = useState<UserRow[]>([]);
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("adminToken");
-    if (!token) {
-      router.replace("/admin/login");
-      return;
-    }
-
-    adminApi.overview()
-      .then((data) => {
-        setSummary(data.summary);
-        setRecentUsers(data.recentUsers);
-      })
+    adminApi
+      .overview()
+      .then((data) => setSummary(data.summary))
       .catch((err) => {
-        setError(err instanceof Error ? err.message : "Unable to load admin dashboard.");
+        toast(err instanceof Error ? err.message : "Failed to load overview.", "error");
       })
       .finally(() => setLoading(false));
-  }, [router]);
+  }, [toast]);
 
-  const statCards = useMemo(() => {
-    if (!summary) return [];
+  const statCards = useMemo(
+    () => (summary ? STAT_CARDS(summary) : []),
+    [summary]
+  );
 
-    return [
-      { label: "Total users", value: summary.totalUsers, accent: "#60a5fa" },
-      { label: "Active tasks", value: summary.activeTasks, accent: "#34d399" },
-      { label: "Completed goals", value: summary.completedGoals, accent: "#fbbf24" },
-      { label: "Active habits", value: summary.activeHabits, accent: "#e879f9" },
-    ];
-  }, [summary]);
-
-  const handleLogout = () => {
-    localStorage.removeItem("adminToken");
-    localStorage.removeItem("adminUser");
-    router.push("/admin/login");
-  };
-
-  if (loading) {
-    return (
-      <div style={{ minHeight: "100vh", display: "grid", placeItems: "center", background: "#f8fafc", color: "#0f172a" }}>
-        Loading admin dashboard...
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div style={{ minHeight: "100vh", display: "grid", placeItems: "center", background: "#f8fafc", padding: 24 }}>
-        <div style={{ maxWidth: 520, width: "100%", background: "#fff", border: "1px solid #e2e8f0", borderRadius: 16, padding: 24 }}>
-          <h2 style={{ marginTop: 0 }}>Admin access issue</h2>
-          <p style={{ color: "#475569" }}>{error}</p>
-          <button onClick={() => router.push("/admin/login")} style={{ padding: "10px 16px", border: "none", borderRadius: 8, background: "#0f172a", color: "#fff", cursor: "pointer" }}>
-            Back to sign in
-          </button>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <DashboardSkeleton />;
 
   return (
-    <div style={{ minHeight: "100vh", background: "linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%)", color: "#0f172a", fontFamily: "system-ui, sans-serif" }}>
-      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "32px 20px 60px" }}>
-        <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28, gap: 16, flexWrap: "wrap" }}>
-          <div>
-            <div style={{ color: "#475569", textTransform: "uppercase", letterSpacing: 2, fontSize: 12, marginBottom: 6 }}>Admin dashboard</div>
-            <h1 style={{ margin: 0, fontSize: 36 }}>Operations overview</h1>
-          </div>
-          <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-            <a href="/" style={{ textDecoration: "none", color: "#0f172a", background: "#fff", border: "1px solid #e2e8f0", padding: "10px 14px", borderRadius: 10, fontWeight: 600 }}>
-              Go to app
-            </a>
-            <button onClick={handleLogout} style={{ border: "none", background: "#0f172a", color: "#fff", borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 700 }}>
-              Logout
-            </button>
-          </div>
-        </header>
+    <div style={{ padding: "28px 28px 60px", maxWidth: 1200 }}>
+      {/* Page header */}
+      <div style={{ marginBottom: 28 }}>
+        <div
+          style={{
+            fontSize: 11,
+            color: "#4ade80",
+            fontWeight: 600,
+            letterSpacing: 2,
+            textTransform: "uppercase",
+            marginBottom: 6,
+          }}
+        >
+          Overview
+        </div>
+        <h2
+          style={{
+            margin: 0,
+            fontSize: 28,
+            fontWeight: 700,
+            color: "#f8fafc",
+            letterSpacing: "-0.02em",
+          }}
+        >
+          Operations Dashboard
+        </h2>
+        <p style={{ margin: "6px 0 0", color: "#475569", fontSize: 14 }}>
+          Real-time system metrics and activity summary.
+        </p>
+      </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16, marginBottom: 24 }}>
-          {statCards.map((card) => (
-            <div key={card.label} style={{ background: "rgba(255,255,255,0.82)", border: "1px solid #e2e8f0", borderRadius: 18, padding: 20, boxShadow: "0 8px 24px rgba(15, 23, 42, 0.04)" }}>
-              <div style={{ color: "#64748b", fontSize: 13, marginBottom: 12 }}>{card.label}</div>
-              <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
-                <span style={{ fontSize: 32, fontWeight: 800, color: card.accent }}>{card.value}</span>
-                <span style={{ width: 12, height: 12, background: card.accent, borderRadius: "50%", display: "inline-block" }} />
+      {/* Stat cards */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+          gap: 16,
+          marginBottom: 28,
+        }}
+      >
+        {statCards.map((card) => {
+          const inner = (
+            <div
+              style={{
+                background: "rgba(255,255,255,0.03)",
+                border: "1px solid rgba(255,255,255,0.07)",
+                borderRadius: 16,
+                padding: "20px 22px",
+                backdropFilter: "blur(8px)",
+                transition: "border-color 0.2s, transform 0.2s",
+                cursor: card.href ? "pointer" : "default",
+              }}
+              onMouseEnter={(e) => {
+                if (card.href) {
+                  (e.currentTarget as HTMLDivElement).style.borderColor = card.accent + "55";
+                  (e.currentTarget as HTMLDivElement).style.transform = "translateY(-2px)";
+                }
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(255,255,255,0.07)";
+                (e.currentTarget as HTMLDivElement).style.transform = "translateY(0)";
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  marginBottom: 14,
+                }}
+              >
+                <span style={{ fontSize: 12, color: "#64748b", fontWeight: 500 }}>
+                  {card.label}
+                </span>
+                <div
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: 8,
+                    background: card.bg,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: 15,
+                  }}
+                >
+                  {card.icon}
+                </div>
+              </div>
+              <div
+                style={{ fontSize: 36, fontWeight: 800, color: card.accent, lineHeight: 1 }}
+              >
+                {card.value.toLocaleString()}
+              </div>
+              {card.href && (
+                <div
+                  style={{ fontSize: 11, color: "#4ade80", marginTop: 10, opacity: 0.8 }}
+                >
+                  View all →
+                </div>
+              )}
+            </div>
+          );
+
+          return card.href ? (
+            <Link key={card.label} href={card.href} style={{ textDecoration: "none" }}>
+              {inner}
+            </Link>
+          ) : (
+            <div key={card.label}>{inner}</div>
+          );
+        })}
+      </div>
+
+      {/* System snapshot */}
+      <div
+        style={{
+          background: "rgba(255,255,255,0.03)",
+          border: "1px solid rgba(255,255,255,0.07)",
+          borderRadius: 16,
+          padding: "22px 24px",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: 20,
+          }}
+        >
+          <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600, color: "#f8fafc" }}>
+            System Snapshot
+          </h3>
+          <span style={{ fontSize: 12, color: "#4b5563" }}>All-time totals</span>
+        </div>
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
+            gap: 12,
+          }}
+        >
+          {[
+            { label: "Total Tasks",   value: summary?.totalTasks   ?? 0 },
+            { label: "Total Goals",   value: summary?.totalGoals   ?? 0 },
+            { label: "Total Habits",  value: summary?.totalHabits  ?? 0 },
+            { label: "Admin Accounts",value: summary?.adminAccounts ?? 0 },
+          ].map((item) => (
+            <div
+              key={item.label}
+              style={{
+                background: "rgba(255,255,255,0.03)",
+                border: "1px solid rgba(255,255,255,0.05)",
+                borderRadius: 12,
+                padding: "14px 16px",
+              }}
+            >
+              <div style={{ fontSize: 11, color: "#4b5563", marginBottom: 6 }}>
+                {item.label}
+              </div>
+              <div
+                style={{
+                  fontFamily: "monospace",
+                  fontSize: 26,
+                  fontWeight: 700,
+                  color: "#f8fafc",
+                }}
+              >
+                {item.value.toLocaleString()}
               </div>
             </div>
           ))}
         </div>
+      </div>
+    </div>
+  );
+}
 
-        <div style={{ display: "grid", gridTemplateColumns: "1.4fr 0.9fr", gap: 20 }}>
-          <div style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 20, padding: 20, boxShadow: "0 8px 24px rgba(15, 23, 42, 0.04)" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-              <h2 style={{ margin: 0, fontSize: 22 }}>Recent users</h2>
-              <span style={{ color: "#64748b", fontSize: 12 }}>Latest activity</span>
-            </div>
+// ── Skeleton loader ───────────────────────────────────────────────────────────
+function DashboardSkeleton() {
+  return (
+    <div style={{ padding: "28px 28px 60px", maxWidth: 1200 }}>
+      <style>{`
+        @keyframes shimmer {
+          0%   { background-position: -600px 0; }
+          100% { background-position:  600px 0; }
+        }
+        .sk {
+          background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%);
+          background-size: 600px 100%;
+          animation: shimmer 1.5s infinite;
+          border-radius: 8px;
+        }
+      `}</style>
 
-            {recentUsers.length === 0 ? (
-              <div style={{ color: "#64748b" }}>No recent users yet.</div>
-            ) : (
-              <div style={{ overflowX: "auto" }}>
-                <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                  <thead>
-                    <tr style={{ borderBottom: "1px solid #e2e8f0" }}>
-                      <th style={{ textAlign: "left", padding: "10px 8px", color: "#64748b" }}>Name</th>
-                      <th style={{ textAlign: "left", padding: "10px 8px", color: "#64748b" }}>Email</th>
-                      <th style={{ textAlign: "left", padding: "10px 8px", color: "#64748b" }}>Role</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {recentUsers.map((user) => (
-                      <tr key={user.id} style={{ borderBottom: "1px solid #f1f5f9" }}>
-                        <td style={{ padding: "10px 8px" }}>{user.name}</td>
-                        <td style={{ padding: "10px 8px", color: "#475569" }}>{user.email}</td>
-                        <td style={{ padding: "10px 8px" }}>
-                          <span style={{
-                            display: "inline-block",
-                            padding: "6px 8px",
-                            borderRadius: 999,
-                            background: user.role === "admin" ? "#dcfce7" : "#e0f2fe",
-                            color: user.role === "admin" ? "#166534" : "#075985",
-                            fontSize: 12,
-                            fontWeight: 700,
-                          }}>
-                            {user.role}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
+      {/* Title skeleton */}
+      <div className="sk" style={{ height: 14, width: 90, marginBottom: 10 }} />
+      <div className="sk" style={{ height: 32, width: 260, marginBottom: 28 }} />
+
+      {/* Cards skeleton */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+          gap: 16,
+          marginBottom: 28,
+        }}
+      >
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div
+            key={i}
+            style={{
+              background: "rgba(255,255,255,0.03)",
+              border: "1px solid rgba(255,255,255,0.07)",
+              borderRadius: 16,
+              padding: "20px 22px",
+            }}
+          >
+            <div className="sk" style={{ height: 12, width: 80, marginBottom: 16 }} />
+            <div className="sk" style={{ height: 40, width: 70 }} />
           </div>
+        ))}
+      </div>
 
-          <div style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 20, padding: 20, boxShadow: "0 8px 24px rgba(15, 23, 42, 0.04)" }}>
-            <h2 style={{ margin: "0 0 16px", fontSize: 22 }}>System snapshot</h2>
-
-            <div style={{ display: "grid", gap: 12 }}>
-              <div style={{ background: "#f8fafc", borderRadius: 12, padding: 14 }}>
-                <div style={{ color: "#64748b", fontSize: 12 }}>Total tracked tasks</div>
-                <div style={{ fontSize: 24, fontWeight: 800 }}>{summary?.totalTasks ?? 0}</div>
-              </div>
-              <div style={{ background: "#f8fafc", borderRadius: 12, padding: 14 }}>
-                <div style={{ color: "#64748b", fontSize: 12 }}>Total goals</div>
-                <div style={{ fontSize: 24, fontWeight: 800 }}>{summary?.totalGoals ?? 0}</div>
-              </div>
-              <div style={{ background: "#f8fafc", borderRadius: 12, padding: 14 }}>
-                <div style={{ color: "#64748b", fontSize: 12 }}>Total habits</div>
-                <div style={{ fontSize: 24, fontWeight: 800 }}>{summary?.totalHabits ?? 0}</div>
-              </div>
-              <div style={{ background: "#f8fafc", borderRadius: 12, padding: 14 }}>
-                <div style={{ color: "#64748b", fontSize: 12 }}>Admin accounts</div>
-                <div style={{ fontSize: 24, fontWeight: 800 }}>{summary?.adminAccounts ?? 0}</div>
-              </div>
+      {/* Snapshot skeleton */}
+      <div
+        style={{
+          background: "rgba(255,255,255,0.03)",
+          border: "1px solid rgba(255,255,255,0.07)",
+          borderRadius: 16,
+          padding: "22px 24px",
+        }}
+      >
+        <div className="sk" style={{ height: 18, width: 140, marginBottom: 20 }} />
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
+            gap: 12,
+          }}
+        >
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div
+              key={i}
+              style={{
+                background: "rgba(255,255,255,0.03)",
+                borderRadius: 12,
+                padding: "14px 16px",
+              }}
+            >
+              <div className="sk" style={{ height: 11, width: 80, marginBottom: 8 }} />
+              <div className="sk" style={{ height: 28, width: 50 }} />
             </div>
-          </div>
+          ))}
         </div>
       </div>
     </div>

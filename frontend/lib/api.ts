@@ -86,6 +86,19 @@ export const authApi = {
   me: () => request<User>("/api/auth/me"),
 };
 
+export type UserListResponse = {
+  users: Array<{
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+    createdAt?: string;
+  }>;
+  total: number;
+  page: number;
+  totalPages: number;
+};
+
 export const adminApi = {
   login: (data: { email: string; password: string }) =>
     request<{ token: string; user: User }>("/api/admin/login", {
@@ -112,6 +125,18 @@ export const adminApi = {
       createdAt?: string;
     }>;
   }>("/api/admin/overview", undefined, "adminToken"),
+  users: (params?: { page?: number; limit?: number; search?: string }) => {
+    const qs = new URLSearchParams();
+    if (params?.page   != null) qs.set("page",   String(params.page));
+    if (params?.limit  != null) qs.set("limit",  String(params.limit));
+    if (params?.search)         qs.set("search", params.search);
+    const query = qs.toString();
+    return request<UserListResponse>(
+      `/api/admin/users${query ? `?${query}` : ""}`,
+      undefined,
+      "adminToken"
+    );
+  },
 };
 
 // ── Tasks ──────────────────────────────────────────────────
