@@ -80,6 +80,11 @@ export const loginApi = {
       method: "POST",
       body: JSON.stringify(data),
     }),
+  forgotPassword: (data: { email: string }) =>
+    request<{ message: string }>("/api/auth/forgot-password", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
 };
 
 export const authApi = {

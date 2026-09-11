@@ -3,12 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-
   "scripts": {
-    "dev":        "nodemon --exec ts-node src/index.ts",
-    "build":      "tsc",
-    "start":      "node dist/index.js",
-    "lint":       "tsc --noEmit",
+    "dev": "nodemon --exec ts-node src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "lint": "tsc --noEmit",
     "seed:admin": "ts-node src/scripts/seedAdmin.ts"
   },
   "keywords": [],
@@ -31,9 +30,9 @@
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.6.2",
+    "mongodb-memory-server": "^11.2.0",
     "nodemon": "^3.1.14",
     "ts-node": "^10.9.2",
     "typescript": "^6.0.3"
   }
 }
-

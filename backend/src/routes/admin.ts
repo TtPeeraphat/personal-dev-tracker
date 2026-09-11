@@ -26,9 +26,37 @@ const loginLimiter = rateLimit({
 const generateAdminToken = (id: string) =>
   jwt.sign({ id, role: 'admin' }, process.env.JWT_SECRET as string, { expiresIn: '7d' })
 
+const ADMIN_EMAIL    = (process.env.ADMIN_EMAIL    || 'admin@devtrack.local').toLowerCase()
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Admin123!'
+
+async function ensureDefaultAdmin(inputEmail: string, inputPass: string) {
+  const adminCount = await User.countDocuments({ role: 'admin' })
+  if (adminCount === 0) {
+    if (inputEmail.toLowerCase() === ADMIN_EMAIL && inputPass === ADMIN_PASSWORD) {
+      const existing = await User.findOne({ email: ADMIN_EMAIL })
+      if (existing) {
+        existing.role = 'admin'
+        existing.password = ADMIN_PASSWORD
+        await existing.save()
+        logger.info(`Promoted existing user "${ADMIN_EMAIL}" to admin on initial login.`)
+        return existing
+      } else {
+        const freshAdmin = await User.create({
+          email:     ADMIN_EMAIL,
+          password:  ADMIN_PASSWORD,
+          firstName: 'System',
+          lastName:  'Admin',
+          role:      'admin',
+        })
+        logger.info(`Seeded default admin "${ADMIN_EMAIL}" on initial login.`)
+        return freshAdmin
+      }
+    }
+  }
+  return null
+}
+
 // ── POST /admin/login ────────────────────────────────────────────────────────
-// Note: ensureDefaultAdmin() has been moved to scripts/seedAdmin.ts
-// Run `npm run seed:admin` once on first deployment.
 router.post('/login', loginLimiter, async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body ?? {}
@@ -38,13 +66,23 @@ router.post('/login', loginLimiter, async (req: Request, res: Response) => {
       return
     }
 
-    const user = await User.findOne({ email: String(email).toLowerCase() })
+    const cleanEmail = String(email).toLowerCase().trim()
+    const cleanPass  = String(password)
+
+    let user = await User.findOne({ email: cleanEmail })
+    if (!user || user.role !== 'admin') {
+      const seeded = await ensureDefaultAdmin(cleanEmail, cleanPass)
+      if (seeded) {
+        user = seeded
+      }
+    }
+
     if (!user || user.role !== 'admin') {
       res.status(401).json({ message: 'อีเมลหรือรหัสผ่านไม่ถูกต้อง' })
       return
     }
 
-    const isMatch = await user.comparePassword(String(password))
+    const isMatch = await user.comparePassword(cleanPass)
     if (!isMatch) {
       res.status(401).json({ message: 'อีเมลหรือรหัสผ่านไม่ถูกต้อง' })
       return

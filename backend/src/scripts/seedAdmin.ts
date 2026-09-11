@@ -24,8 +24,8 @@ dotenv.config({ path: path.resolve(__dirname, '../../.env') })
 import mongoose from 'mongoose'
 import { User } from '../models/user'
 
-const ADMIN_EMAIL    = (process.env.ADMIN_EMAIL    || '').toLowerCase()
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || ''
+const ADMIN_EMAIL    = (process.env.ADMIN_EMAIL    || 'admin@devtrack.local').toLowerCase()
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Admin123!'
 
 async function main() {
   // ── Validate required env vars ────────────────────────────────────────────

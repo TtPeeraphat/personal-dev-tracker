@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { S, modalOverlay, modalBox, labelStyle, JOURNAL_ENTRIES } from "@/constants/styles";
 
 interface JournalEntry {
@@ -13,6 +13,8 @@ interface JournalEntry {
 }
 
 export function Journal() {
+  const [currentUser, setCurrentUser] = useState<{ id?: string; _id?: string; email?: string; role?: string } | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [entries, setEntries] = useState<JournalEntry[]>([]);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -29,39 +31,72 @@ export function Journal() {
 
   const moods = ["All", "😊 Good", "🔥 Energized", "😐 Neutral", "😴 Tired", "😞 Rough"];
 
-  // Initialize and load from local storage
+  // 1. Detect logged-in user and admin state on mount
   useEffect(() => {
-    const local = localStorage.getItem("devtrack_journal");
+    if (typeof window === "undefined") return;
+
+    // Check if logged in as admin
+    const adminUser = localStorage.getItem("adminUser");
+    const adminToken = localStorage.getItem("adminToken");
+
+    let userObj = null;
+    try {
+      const u = localStorage.getItem("user");
+      if (u) userObj = JSON.parse(u);
+    } catch (e) {
+      console.error("Failed to parse user state", e);
+    }
+
+    const adminState = !!adminUser || !!adminToken || userObj?.role === "admin";
+    setIsAdmin(adminState);
+    setCurrentUser(userObj);
+  }, []);
+
+  // 2. User-isolated storage key
+  const storageKey = useMemo(() => {
+    if (!currentUser) return null;
+    const userId = currentUser.id || currentUser._id || currentUser.email;
+    return userId ? `devtrack_journal_${userId}` : null;
+  }, [currentUser]);
+
+  // 3. Load user-specific entries from local storage
+  useEffect(() => {
+    if (!storageKey || isAdmin) {
+      setEntries([]);
+      setSelectedId(null);
+      return;
+    }
+
+    const local = localStorage.getItem(storageKey);
     let loaded: JournalEntry[] = [];
     if (local) {
       try {
         loaded = JSON.parse(local);
       } catch (e) {
-        console.error("Error loading journal entries", e);
+        console.error("Error loading journal entries for user", e);
       }
     }
 
-    // Seed preset data if local storage is empty
+    // Seed preset data for first-time visits by this user
     if (!loaded || loaded.length === 0) {
       loaded = JOURNAL_ENTRIES.map(item => ({
         ...item,
-        content: item.preview // Pre-fill full content with the preview text as a starting point
+        content: item.preview
       }));
-      localStorage.setItem("devtrack_journal", JSON.stringify(loaded));
+      localStorage.setItem(storageKey, JSON.stringify(loaded));
     }
 
     setEntries(loaded);
     if (loaded.length > 0) {
       setSelectedId(loaded[0].id);
     }
-  }, []);
+  }, [storageKey, isAdmin]);
 
   // Listen for the custom "New Entry" Topbar trigger
   useEffect(() => {
     const handleTrigger = (e: Event) => {
       const customEvent = e as CustomEvent;
-      if (customEvent.detail?.section === "journal") {
-        // Set default date to today
+      if (customEvent.detail?.section === "journal" && !isAdmin && currentUser) {
         const todayStr = new Date().toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
         setNewEntry({
           title: "",
@@ -75,10 +110,11 @@ export function Journal() {
 
     window.addEventListener("trigger-create", handleTrigger);
     return () => window.removeEventListener("trigger-create", handleTrigger);
-  }, []);
+  }, [isAdmin, currentUser]);
 
   // Actions
   const handleSaveEntry = () => {
+    if (!storageKey) return;
     if (!newEntry.title.trim() || !newEntry.content.trim()) {
       alert("Title and content are required to create a journal entry!");
       return;
@@ -95,16 +131,17 @@ export function Journal() {
 
     const updated = [created, ...entries];
     setEntries(updated);
-    localStorage.setItem("devtrack_journal", JSON.stringify(updated));
+    localStorage.setItem(storageKey, JSON.stringify(updated));
     setSelectedId(created.id);
     setShowModal(false);
   };
 
   const handleDeleteEntry = (id: number) => {
+    if (!storageKey) return;
     if (!confirm("Are you sure you want to delete this journal entry?")) return;
     const updated = entries.filter(e => e.id !== id);
     setEntries(updated);
-    localStorage.setItem("devtrack_journal", JSON.stringify(updated));
+    localStorage.setItem(storageKey, JSON.stringify(updated));
     
     if (updated.length > 0) {
       setSelectedId(updated[0].id);
@@ -112,6 +149,56 @@ export function Journal() {
       setSelectedId(null);
     }
   };
+
+  // ── Privacy Guard 1: Administrator Access Restricted ─────────────────────────
+  if (isAdmin) {
+    return (
+      <div style={{
+        display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+        minHeight: 380, padding: 32, background: "#ffffff", borderRadius: 12, border: "0.5px solid rgba(0,0,0,0.08)",
+        textAlign: "center", margin: "20px 0"
+      }}>
+        <div style={{ fontSize: 44, marginBottom: 16 }}>🔒</div>
+        <h3 style={{ fontFamily: "Georgia, serif", fontSize: 22, fontStyle: "italic", fontWeight: 400, marginBottom: 8, color: "#1a1a18" }}>
+          Journal Privacy Protection Active
+        </h3>
+        <p style={{ color: "#5F5E5A", fontSize: 13, maxWidth: 460, lineHeight: 1.6, marginBottom: 20 }}>
+          Journal reflections are end-to-end user-isolated data. To protect user privacy, administrators and other accounts cannot access or view private journal reflections.
+        </p>
+        <span style={{ fontSize: 11, color: "#0F6E56", fontFamily: "monospace", background: "#E1F5EE", padding: "4px 12px", borderRadius: 20, fontWeight: 600 }}>
+          Privilege Mode: Administrator (Access Restricted)
+        </span>
+      </div>
+    );
+  }
+
+  // ── Privacy Guard 2: Unauthenticated Visitor Guard ────────────────────────────
+  if (!currentUser) {
+    return (
+      <div style={{
+        display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+        minHeight: 380, padding: 32, background: "#ffffff", borderRadius: 12, border: "0.5px solid rgba(0,0,0,0.08)",
+        textAlign: "center", margin: "20px 0"
+      }}>
+        <div style={{ fontSize: 44, marginBottom: 16 }}>🔑</div>
+        <h3 style={{ fontFamily: "Georgia, serif", fontSize: 22, fontStyle: "italic", fontWeight: 400, marginBottom: 8, color: "#1a1a18" }}>
+          User Sign-In Required
+        </h3>
+        <p style={{ color: "#5F5E5A", fontSize: 13, maxWidth: 460, lineHeight: 1.6, marginBottom: 20 }}>
+          Please sign in with your user account to access and save your private, end-to-end isolated journal reflections.
+        </p>
+        <a
+          href="/login"
+          style={{
+            padding: "9px 20px", borderRadius: 8, background: "#1D9E75", color: "#ffffff",
+            fontSize: 13, fontWeight: 500, textDecoration: "none", transition: "background 0.15s"
+          }}
+        >
+          Sign In to Access Journal →
+        </a>
+      </div>
+    );
+  }
 
   // Filter and search entries
   const filtered = entries
@@ -250,7 +337,7 @@ export function Journal() {
             </div>
 
             <div style={{ borderTop: "0.5px solid rgba(0,0,0,0.06)", paddingTop: 14, marginTop: 24, fontSize: 11, color: "#888780", fontStyle: "italic", display: "flex", justifyContent: "space-between" }}>
-              <span>Personal Development Tracker · Journaling Module</span>
+              <span>Personal Development Tracker · Private Journaling Module</span>
               <span>ID: #{activeEntry.id}</span>
             </div>
 

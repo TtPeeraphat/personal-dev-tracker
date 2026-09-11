@@ -159,6 +159,7 @@ function AdminLoginForm() {
             placeholder="admin@example.com"
             required
             autoComplete="email"
+            suppressHydrationWarning
           />
         </div>
 
@@ -187,6 +188,7 @@ function AdminLoginForm() {
             placeholder="••••••••"
             required
             autoComplete="current-password"
+            suppressHydrationWarning
           />
         </div>
 
@@ -217,6 +219,7 @@ function AdminLoginForm() {
           type="submit"
           className="admin-login-btn"
           disabled={loading}
+          suppressHydrationWarning
         >
           {loading ? (
             <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
