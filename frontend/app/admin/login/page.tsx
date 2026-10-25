@@ -13,6 +13,13 @@ function AdminLoginForm() {
   const [loading, setLoading]   = useState(false);
   const [error, setError]       = useState("");
   const [shake, setShake]       = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleAutoFillDemo = () => {
+    setEmail("admin@devtrack.local");
+    setPassword("Admin123!");
+    setError("");
+  };
 
   // Clear any stale session on mount
   useEffect(() => {
@@ -164,24 +171,40 @@ function AdminLoginForm() {
         </div>
 
         {/* Password */}
-        <div style={{ marginBottom: 20 }}>
-          <label
-            htmlFor="admin-password"
-            style={{
-              display: "block",
-              color: "#888780",
-              fontSize: 11,
-              fontWeight: 600,
-              marginBottom: 5,
-              textTransform: "uppercase",
-              letterSpacing: "0.04em",
-            }}
-          >
-            Password
-          </label>
+        <div style={{ marginBottom: 16 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5 }}>
+            <label
+              htmlFor="admin-password"
+              style={{
+                display: "block",
+                color: "#888780",
+                fontSize: 11,
+                fontWeight: 600,
+                textTransform: "uppercase",
+                letterSpacing: "0.04em",
+              }}
+            >
+              Password
+            </label>
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              style={{
+                border: "none",
+                background: "transparent",
+                color: "#1D9E75",
+                fontSize: 11,
+                cursor: "pointer",
+                padding: 0,
+                fontWeight: 500,
+              }}
+            >
+              {showPassword ? "🙈 Hide" : "👁 Show"}
+            </button>
+          </div>
           <input
             id="admin-password"
-            type="password"
+            type={showPassword ? "text" : "password"}
             className="admin-login-input"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -190,6 +213,25 @@ function AdminLoginForm() {
             autoComplete="current-password"
             suppressHydrationWarning
           />
+        </div>
+
+        {/* Demo Auto-fill Helper */}
+        <div style={{ marginBottom: 18, textAlign: "right" }}>
+          <button
+            type="button"
+            onClick={handleAutoFillDemo}
+            style={{
+              border: "none",
+              background: "transparent",
+              color: "#888780",
+              fontSize: 11,
+              cursor: "pointer",
+              padding: 0,
+              textDecoration: "underline",
+            }}
+          >
+            ⚡ Auto-fill Demo Admin Credentials
+          </button>
         </div>
 
         {/* Error banner */}

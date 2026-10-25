@@ -1,19 +1,96 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="b6930541-6ad6-4304-916b-9bf3044d9f9f" name="Changes" comment="" />
+    <list default="true" id="b6930541-6ad6-4304-916b-9bf3044d9f9f" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/routes/admin.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/routes/admin.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/tsconfig.tsbuildinfo" beforeDir="false" afterPath="$PROJECT_DIR$/backend/tsconfig.tsbuildinfo" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/app/admin/login/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/admin/login/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/app/admin/users/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/admin/users/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/lib/api.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/lib/api.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/tsconfig.tsbuildinfo" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/tsconfig.tsbuildinfo" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="82" />
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 1,
-  "fromUser": false
-}]]></component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
+  <component name="NextEditCompletionFeaturesState">
+    <decayedCancelled>
+      <entry key="MS100" value="1.5515480038023575" />
+      <entry key="MS500" value="3.710708997100454" />
+      <entry key="S2" value="9.449409631343118" />
+      <entry key="S5" value="15.77706698807092" />
+      <entry key="S10" value="20.420764297443466" />
+      <entry key="S30" value="26.546927629573563" />
+      <entry key="S60" value="29.30631387813288" />
+      <entry key="M2" value="32.009598761814644" />
+      <entry key="M5" value="38.63717524638404" />
+      <entry key="M10" value="44.516223238276154" />
+      <entry key="M15" value="47.35535378375382" />
+      <entry key="M30" value="50.80422287967819" />
+      <entry key="H1" value="52.799041278776805" />
+      <entry key="H2" value="53.872429089087454" />
+      <entry key="H4" value="54.429268699578" />
+      <entry key="D1" value="54.90389837534891" />
+      <entry key="W1" value="54.98624700421307" />
+    </decayedCancelled>
+    <decayedSelected>
+      <entry key="MS100" value="0.0" />
+      <entry key="MS500" value="0.0" />
+      <entry key="S2" value="0.0" />
+      <entry key="S5" value="0.0" />
+      <entry key="S10" value="0.0" />
+      <entry key="S30" value="0.0" />
+      <entry key="S60" value="0.0" />
+      <entry key="M2" value="0.0" />
+      <entry key="M5" value="0.0" />
+      <entry key="M10" value="0.0" />
+      <entry key="M15" value="0.0" />
+      <entry key="M30" value="0.0" />
+      <entry key="H1" value="0.0" />
+      <entry key="H2" value="0.0" />
+      <entry key="H4" value="0.0" />
+      <entry key="D1" value="0.0" />
+      <entry key="W1" value="0.0" />
+    </decayedSelected>
+    <decayedShown>
+      <entry key="MS100" value="1.4667105824253384" />
+      <entry key="MS500" value="3.667797660563694" />
+      <entry key="S2" value="9.421309050231581" />
+      <entry key="S5" value="15.757923266940857" />
+      <entry key="S10" value="20.40812304232516" />
+      <entry key="S30" value="26.54106486592016" />
+      <entry key="S60" value="29.302936261474503" />
+      <entry key="M2" value="32.00755184607495" />
+      <entry key="M5" value="38.63583257169625" />
+      <entry key="M10" value="44.515300550002436" />
+      <entry key="M15" value="47.35465640623434" />
+      <entry key="M30" value="50.80382388750807" />
+      <entry key="H1" value="52.79882716900678" />
+      <entry key="H2" value="53.87231809417464" />
+      <entry key="H4" value="54.429212179098634" />
+      <entry key="D1" value="54.90388880984887" />
+      <entry key="W1" value="54.98624563410756" />
+    </decayedShown>
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 1,
+  &quot;fromUser&quot;: false
+}</component>
   <component name="ProjectId" id="3E1beuaNOTStNpqzqmdLq98pvVQ" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -22,7 +99,9 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "codeWithMe.voiceChat.enabledByDefault": "false",
@@ -33,7 +112,9 @@
     "junie.onboarding.icon.badge.shown": "true",
     "last_opened_file_path": "C:/Users/tt_pe/Documents/GitHub/personal-dev-tracker",
     "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
     "settings.editor.selected.configurable": "preferences.pluginManager",
     "to.speed.mode.migration.done": "true",
@@ -55,6 +136,8 @@
       <option name="presentableId" value="Default" />
       <updated>1779349123994</updated>
       <workItem from="1779349124507" duration="261000" />
+      <workItem from="1789275315707" duration="14000" />
+      <workItem from="1789275366787" duration="1269000" />
     </task>
     <servers />
   </component>

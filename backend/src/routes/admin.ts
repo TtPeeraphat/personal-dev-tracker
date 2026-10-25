@@ -17,9 +17,9 @@ const loginLimiter = rateLimit({
   message: {
     message: 'Too many login attempts. Please try again in 15 minutes.',
   },
-  standardHeaders: true,  // Return rate limit info in `RateLimit-*` headers
-  legacyHeaders: false,   // Disable `X-RateLimit-*` headers
-  skipSuccessfulRequests: true, // Only count failed attempts
+  standardHeaders: true,
+  legacyHeaders: false,
+  skipSuccessfulRequests: true,
 })
 
 // ── Helper ──────────────────────────────────────────────────────────────────
@@ -213,6 +213,79 @@ router.get('/users', adminProtect, async (req: AuthRequest, res: Response) => {
     })
   } catch (error) {
     logger.error('GET /admin/users', error)
+    res.status(500).json({ message: 'เกิดข้อผิดพลาดภายในระบบ' })
+  }
+})
+
+// ── PATCH /admin/users/:id/role ──────────────────────────────────────────────
+router.patch('/users/:id/role', adminProtect, async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params
+    const { role } = req.body ?? {}
+
+    if (!['user', 'admin'].includes(role)) {
+      res.status(400).json({ message: 'สิทธิ์การใช้งานไม่ถูกต้อง (ต้องเป็น user หรือ admin)' })
+      return
+    }
+
+    if (req.userId === id && role !== 'admin') {
+      res.status(400).json({ message: 'ไม่สามารถยกเลิกสิทธิ์ผู้ดูแลระบบของตัวเองได้' })
+      return
+    }
+
+    const user = await User.findById(id)
+    if (!user) {
+      res.status(404).json({ message: 'ไม่พบผู้ใช้ที่ต้องการแก้ไข' })
+      return
+    }
+
+    user.role = role
+    await user.save()
+
+    logger.info(`Admin ${req.userId} updated role of user ${id} to ${role}`)
+
+    res.json({
+      id: user._id,
+      name: `${user.firstName} ${user.lastName}`,
+      email: user.email,
+      role: user.role,
+      createdAt: user.createdAt,
+    })
+  } catch (error) {
+    logger.error('PATCH /admin/users/:id/role', error)
+    res.status(500).json({ message: 'เกิดข้อผิดพลาดภายในระบบ' })
+  }
+})
+
+// ── DELETE /admin/users/:id ──────────────────────────────────────────────────
+router.delete('/users/:id', adminProtect, async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params
+
+    if (req.userId === id) {
+      res.status(400).json({ message: 'ไม่สามารถลบบัญชีผู้ดูแลระบบของตัวเองได้' })
+      return
+    }
+
+    const user = await User.findById(id)
+    if (!user) {
+      res.status(404).json({ message: 'ไม่พบผู้ใช้ที่ต้องการลบ' })
+      return
+    }
+
+    // Delete associated data for this user
+    await Promise.all([
+      User.deleteOne({ _id: id }),
+      Task.deleteMany({ user: id }),
+      Goal.deleteMany({ user: id }),
+      Habit.deleteMany({ user: id }),
+    ])
+
+    logger.info(`Admin ${req.userId} deleted user ${id}`)
+
+    res.json({ message: `ลบบัญชีผู้ใช้ ${user.email} เรียบร้อยแล้ว` })
+  } catch (error) {
+    logger.error('DELETE /admin/users/:id', error)
     res.status(500).json({ message: 'เกิดข้อผิดพลาดภายในระบบ' })
   }
 })

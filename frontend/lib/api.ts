@@ -142,6 +142,23 @@ export const adminApi = {
       "adminToken"
     );
   },
+  updateRole: (userId: string, role: "user" | "admin") =>
+    request<{ id: string; role: string }>(
+      `/api/admin/users/${userId}/role`,
+      {
+        method: "PATCH",
+        body: JSON.stringify({ role }),
+      },
+      "adminToken"
+    ),
+  deleteUser: (userId: string) =>
+    request<{ message: string }>(
+      `/api/admin/users/${userId}`,
+      {
+        method: "DELETE",
+      },
+      "adminToken"
+    ),
 };
 
 // ── Tasks ──────────────────────────────────────────────────

@@ -41,6 +41,7 @@ export default function AdminUsersPage() {
   const [page, setPage]         = useState(1);
   const [data, setData]         = useState<PageData | null>(null);
   const [loading, setLoading]   = useState(true);
+  const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
 
   // Debounce search input by 350ms
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -62,7 +63,6 @@ export default function AdminUsersPage() {
         limit: PAGE_SIZE,
         search: debouncedSearch || undefined,
       });
-      // Cast: API returns role as string, PageData expects the literal union
       setData(result as unknown as PageData);
     } catch (err) {
       toast(err instanceof Error ? err.message : "Failed to load users.", "error");
@@ -74,6 +74,44 @@ export default function AdminUsersPage() {
   useEffect(() => {
     fetchUsers();
   }, [fetchUsers]);
+
+  // Handle Role Toggle (Promote to Admin / Demote to User)
+  const handleToggleRole = async (user: UserRow) => {
+    const nextRole = user.role === "admin" ? "user" : "admin";
+    const actionLabel = nextRole === "admin" ? "Promote to Admin" : "Demote to User";
+    if (!confirm(`Are you sure you want to ${actionLabel} for "${user.name}" (${user.email})?`)) {
+      return;
+    }
+
+    setActionLoadingId(user.id);
+    try {
+      await adminApi.updateRole(user.id, nextRole);
+      toast(`Successfully updated ${user.name} to ${nextRole}.`, "success");
+      fetchUsers();
+    } catch (err) {
+      toast(err instanceof Error ? err.message : "Failed to update role.", "error");
+    } finally {
+      setActionLoadingId(null);
+    }
+  };
+
+  // Handle User Account Deletion
+  const handleDeleteUser = async (user: UserRow) => {
+    if (!confirm(`CAUTION: Delete account for "${user.name}" (${user.email})? This action is permanent.`)) {
+      return;
+    }
+
+    setActionLoadingId(user.id);
+    try {
+      const res = await adminApi.deleteUser(user.id);
+      toast(res.message || "User account deleted successfully.", "success");
+      fetchUsers();
+    } catch (err) {
+      toast(err instanceof Error ? err.message : "Failed to delete user.", "error");
+    } finally {
+      setActionLoadingId(null);
+    }
+  };
 
   const totalPages = data?.totalPages ?? 1;
 
@@ -178,7 +216,7 @@ export default function AdminUsersPage() {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "1fr 1.4fr 100px 140px",
+            gridTemplateColumns: "1fr 1.3fr 90px 110px 140px",
             padding: "10px 18px",
             borderBottom: "0.5px solid rgba(0,0,0,0.08)",
             fontSize: 10,
@@ -193,6 +231,7 @@ export default function AdminUsersPage() {
           <span>Email</span>
           <span>Role</span>
           <span>Joined</span>
+          <span style={{ textAlign: "right" }}>Actions</span>
         </div>
 
         {/* Rows */}
@@ -217,6 +256,9 @@ export default function AdminUsersPage() {
               key={user.id}
               user={user}
               isLast={idx === data.users.length - 1}
+              isBusy={actionLoadingId === user.id}
+              onToggleRole={() => handleToggleRole(user)}
+              onDelete={() => handleDeleteUser(user)}
             />
           ))
         )}
@@ -237,17 +279,30 @@ export default function AdminUsersPage() {
 }
 
 // ── UserRow ───────────────────────────────────────────────────────────────────
-function UserRow({ user, isLast }: { user: UserRow; isLast: boolean }) {
+function UserRow({
+  user,
+  isLast,
+  isBusy,
+  onToggleRole,
+  onDelete,
+}: {
+  user: UserRow;
+  isLast: boolean;
+  isBusy: boolean;
+  onToggleRole: () => void;
+  onDelete: () => void;
+}) {
   const isAdmin = user.role === "admin";
   return (
     <div
       style={{
         display: "grid",
-        gridTemplateColumns: "1fr 1.4fr 100px 140px",
+        gridTemplateColumns: "1fr 1.3fr 90px 110px 140px",
         padding: "12px 18px",
         borderBottom: isLast ? "none" : "0.5px solid rgba(0,0,0,0.06)",
         alignItems: "center",
         transition: "background 0.15s",
+        opacity: isBusy ? 0.5 : 1,
       }}
       onMouseEnter={(e) =>
         ((e.currentTarget as HTMLDivElement).style.background = "#F4F4F0")
@@ -304,6 +359,47 @@ function UserRow({ user, isLast }: { user: UserRow; isLast: boolean }) {
       <span style={{ fontSize: 12, color: "#888780" }}>
         {formatDate(user.createdAt)}
       </span>
+
+      {/* Admin Action Buttons */}
+      <div style={{ display: "flex", gap: 6, justifyContent: "flex-end", alignItems: "center" }}>
+        <button
+          type="button"
+          disabled={isBusy}
+          onClick={onToggleRole}
+          title={isAdmin ? "Demote to User" : "Promote to Admin"}
+          style={{
+            padding: "4px 8px",
+            borderRadius: 6,
+            border: "0.5px solid rgba(0,0,0,0.12)",
+            background: "#ffffff",
+            color: isAdmin ? "#888780" : "#0F6E56",
+            fontSize: 11,
+            cursor: isBusy ? "not-allowed" : "pointer",
+            fontFamily: "inherit",
+          }}
+        >
+          {isAdmin ? "Demote" : "Promote"}
+        </button>
+
+        <button
+          type="button"
+          disabled={isBusy}
+          onClick={onDelete}
+          title="Delete account"
+          style={{
+            padding: "4px 8px",
+            borderRadius: 6,
+            border: "0.5px solid rgba(163,45,45,0.2)",
+            background: "#FCEBEB",
+            color: "#A32D2D",
+            fontSize: 11,
+            cursor: isBusy ? "not-allowed" : "pointer",
+            fontFamily: "inherit",
+          }}
+        >
+          Delete
+        </button>
+      </div>
     </div>
   );
 }
@@ -329,7 +425,7 @@ function SkeletonRows() {
           key={i}
           style={{
             display: "grid",
-            gridTemplateColumns: "1fr 1.4fr 100px 140px",
+            gridTemplateColumns: "1fr 1.3fr 90px 110px 140px",
             padding: "12px 18px",
             borderBottom: i < 7 ? "0.5px solid rgba(0,0,0,0.06)" : "none",
             gap: 0,
@@ -343,6 +439,10 @@ function SkeletonRows() {
           <div className="sk-row" style={{ height: 13, width: "75%" }} />
           <div className="sk-row" style={{ height: 20, width: 50, borderRadius: 20 }} />
           <div className="sk-row" style={{ height: 12, width: 80 }} />
+          <div style={{ display: "flex", justifyContent: "flex-end", gap: 6 }}>
+            <div className="sk-row" style={{ height: 22, width: 50 }} />
+            <div className="sk-row" style={{ height: 22, width: 45 }} />
+          </div>
         </div>
       ))}
     </>
